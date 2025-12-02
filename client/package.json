@@ -1,0 +1,41 @@
+{
+  "name": "client",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@auth/prisma-adapter": "^2.11.1",
+    "@hocuspocus/provider": "^3.4.0",
+    "@tiptap/extension-collaboration": "^3.11.1",
+    "@tiptap/react": "^3.11.1",
+    "@tiptap/starter-kit": "^3.11.1",
+    "@types/jsonwebtoken": "^9.0.10",
+    "bcryptjs": "^3.0.3",
+    "dotenv": "^17.2.3",
+    "jsonwebtoken": "^9.0.2",
+    "next": "16.0.6",
+    "next-auth": "^4.24.13",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "y-websocket": "^3.0.0",
+    "yjs": "^13.6.27"
+  },
+  "devDependencies": {
+    "@prisma/client": "^5.22.0",
+    "@tailwindcss/postcss": "^4",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.0.6",
+    "prisma": "^5.22.0",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}
