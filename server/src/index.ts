@@ -96,11 +96,13 @@ const hocuspocus = new Server({
     onChange: async (data) => {
         console.log(`DEBUG: Document changed: ${data.documentName}, context: ${data.context}`)
     },
-    onConnect: () => {
+    onConnect: (data) => {
         console.log('DEBUG: Client connected')
+        return Promise.resolve()
     },
-    onDisconnect: () => {
+    onDisconnect: (data) => {
         console.log('DEBUG: Client disconnected')
+        return Promise.resolve()
     },
 })
 
