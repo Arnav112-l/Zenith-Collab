@@ -67,4 +67,23 @@ model Document {
   userId       String?
   user         User?    @relation(fields: [userId], references: [id])
   publicAccess String   @default("PRIVATE") // "PRIVATE", "READ", "WRITE"
+  type         DocumentType @default(TEXT)
+  isArchived   Boolean      @default(false)
+  isTrash      Boolean      @default(false)
+  isFavorite   Boolean      @default(false)
+  deletedAt    DateTime?
+}
+
+enum DocumentType {
+  TEXT
+  CODE
+  CANVAS
+  BUDGET
+  EXPENSE
+  KANBAN
+  CALENDAR
+  TIMETRACKER
+  GOALS
+  FILES
+  AI
 }

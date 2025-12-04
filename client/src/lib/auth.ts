@@ -3,12 +3,10 @@ import GithubProvider from "next-auth/providers/github";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
 
-console.log("DEBUG: Auth Env Vars", {
-    GITHUB_ID: process.env.GITHUB_ID,
-    NEXTAUTH_URL: process.env.NEXTAUTH_URL,
-});
+
 
 export const authOptions: NextAuthOptions = {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     adapter: PrismaAdapter(prisma) as any, // Type assertion might be needed for v4 compatibility
     providers: [
         GithubProvider({

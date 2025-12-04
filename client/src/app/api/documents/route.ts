@@ -2,8 +2,9 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
+import * as Y from "yjs";
 
-export async function POST() {
+export async function POST(req: Request) {
     const session = await getServerSession(authOptions);
 
     if (!session || !session.user) {
@@ -11,11 +12,33 @@ export async function POST() {
     }
 
     try {
+        const body = await req.json();
+        const { title, type } = body;
+
+        let initialContent: Buffer;
+
+        if (type === "CANVAS") {
+            const canvasData = { elements: [], appState: { viewBackgroundColor: "#121212" } };
+            initialContent = Buffer.from(JSON.stringify(canvasData));
+        } else if (type === "CODE") {
+            initialContent = Buffer.from("// Start coding...");
+        } else if (type === "TEXT") {
+            const ydoc = new Y.Doc();
+            const state = Y.encodeStateAsUpdate(ydoc);
+            initialContent = Buffer.from(state);
+        } else if (type === "FILES") {
+            initialContent = Buffer.from("[]");
+        } else {
+            // Default for other types (JSON empty object or similar)
+            initialContent = Buffer.from("{}");
+        }
+
         const doc = await prisma.document.create({
             data: {
-                title: "Untitled Document",
-                content: Buffer.from(new Uint8Array(0)), // Empty Yjs doc
-                userId: session.user.id,
+                title: title || "Untitled Document",
+                type: type || "TEXT",
+                content: initialContent,
+                userId: session?.user?.id || null,
             },
         });
 
