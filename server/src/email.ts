@@ -3,13 +3,19 @@ import nodemailer from 'nodemailer';
 // Create email transporter
 // You'll need to configure this with your email service
 export const createTransporter = () => {
-  // For development, use a test account or your email service
-  // Example with Gmail (you'll need to enable "Less secure app access" or use App Password)
+  const emailUser = process.env.EMAIL_USER;
+  const emailPass = process.env.EMAIL_PASS;
+
+  if (!emailUser || !emailPass) {
+    console.warn('⚠️ Email credentials not configured. Set EMAIL_USER and EMAIL_PASS environment variables.');
+    return null;
+  }
+
   return nodemailer.createTransport({
-    service: 'gmail', // or 'outlook', 'yahoo', etc.
+    service: process.env.EMAIL_SERVICE || 'gmail',
     auth: {
-      user: process.env.EMAIL_USER || 'your-email@gmail.com',
-      pass: process.env.EMAIL_PASS || 'your-app-password'
+      user: emailUser,
+      pass: emailPass
     }
   });
 };
@@ -21,6 +27,11 @@ export const sendEventReminderEmail = async (
   eventEnd?: Date
 ) => {
   const transporter = createTransporter();
+
+  if (!transporter) {
+    console.warn(`Skipping email to ${to} - email not configured`);
+    return false;
+  }
 
   const formattedStart = new Date(eventStart).toLocaleString('en-US', {
     weekday: 'long',
@@ -37,7 +48,7 @@ export const sendEventReminderEmail = async (
   }) : null;
 
   const mailOptions = {
-    from: process.env.EMAIL_USER || 'noreply@notpe.com',
+    from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
     to,
     subject: `📅 Reminder: ${eventTitle}`,
     html: `

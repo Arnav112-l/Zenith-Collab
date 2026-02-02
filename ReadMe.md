@@ -3,20 +3,31 @@
 ## 🎯 Overview
 - **Frontend (Client)**: Vercel
 - **Backend (Server)**: Render
-- **Database**: Neon PostgreSQL (Free)
+- **Database**: MongoDB Atlas (Free)
 - **Auth**: GitHub OAuth
 
 ---
 
-## 📋 Step 1: Database Setup (Neon)
+## 📋 Step 1: Database Setup (MongoDB Atlas)
 
-1. Go to **[neon.tech](https://neon.tech)** and sign up
-2. Click **"Create Project"**
-3. Choose a region close to you
-4. Copy both connection strings:
-   - **Connection string** → `DATABASE_URL`
-   - **Connection string (pooled)** → `DIRECT_URL`
-5. Save these for later!
+1. Go to **[MongoDB Atlas](https://cloud.mongodb.com)** and sign up
+2. Click **"Build a Database"** → Choose **FREE** tier
+3. Select a cloud provider and region close to you
+4. Create a cluster (default name is fine)
+5. Create a database user:
+   - Go to **Database Access** → **Add New Database User**
+   - Choose **Password** authentication
+   - Set a username and password (save these!)
+   - Set **Built-in Role** to **Read and write to any database**
+6. Add your IP to the access list:
+   - Go to **Network Access** → **Add IP Address**
+   - Click **Allow Access from Anywhere** (for development) or add specific IPs
+7. Get your connection string:
+   - Go to **Database** → **Connect** → **Drivers**
+   - Copy the connection string
+   - Replace `<password>` with your database user password
+   - Example: `mongodb+srv://username:password@cluster0.xxxxx.mongodb.net/zenith?retryWrites=true&w=majority`
+8. Save this as your `DATABASE_URL`!
 
 ---
 

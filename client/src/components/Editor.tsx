@@ -143,8 +143,9 @@ const Editor = ({ documentId, readOnly = false, token }: { documentId: string; r
 
   useEffect(() => {
     // Set up Hocuspocus Provider (WebSocket)
+    const wsUrl = process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:4000';
     const wsProvider = new HocuspocusProvider({
-      url: `ws://localhost:4000?token=${token}`,
+      url: `${wsUrl}?token=${token}`,
       name: documentId,
       document: ydoc,
       onStatus: (event: { status: string }) => {
