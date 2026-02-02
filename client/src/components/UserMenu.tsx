@@ -2,12 +2,24 @@
 
 import { useSession, signIn, signOut } from "next-auth/react";
 import Image from "next/image";
-import { useState } from "react";
-import { User, LogOut, LogIn, ChevronDown } from "lucide-react";
+import { useState, useEffect } from "react";
+import { User, LogOut, LogIn, ChevronDown, Sun, Moon } from "lucide-react";
+import { useTheme } from "next-themes";
 
 export default function UserMenu() {
   const { data: session, status } = useSession();
   const [isOpen, setIsOpen] = useState(false);
+  const { theme, setTheme, resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  // Prevent hydration mismatch
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const toggleTheme = () => {
+    setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
+  };
 
   if (status === "loading") {
     return (
@@ -56,6 +68,26 @@ export default function UserMenu() {
                 </div>
               </div>
               <div className="p-2">
+                {/* Theme Toggle */}
+                <button
+                  onClick={() => {
+                    toggleTheme();
+                  }}
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                >
+                  {mounted && resolvedTheme === 'dark' ? (
+                    <>
+                      <Sun className="h-4 w-4" />
+                      <span>Light Mode</span>
+                    </>
+                  ) : (
+                    <>
+                      <Moon className="h-4 w-4" />
+                      <span>Dark Mode</span>
+                    </>
+                  )}
+                </button>
+                
                 <button
                   onClick={() => {
                     setIsOpen(false);

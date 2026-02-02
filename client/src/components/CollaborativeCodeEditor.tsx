@@ -1,24 +1,47 @@
 "use client";
 
-import { useState } from "react";
-import { Editor } from "@monaco-editor/react";
-import { useTheme } from "next-themes";
+import { useState, useEffect, useRef } from "react";
+import { Editor, OnMount } from "@monaco-editor/react";
 import { Play, Terminal, ChevronUp, ChevronDown, Trash2 } from "lucide-react";
+import * as Y from "yjs";
+import { HocuspocusProvider } from "@hocuspocus/provider";
+import { MonacoBinding } from "y-monaco";
+import { IndexeddbPersistence } from "y-indexeddb";
+import { useSession } from "next-auth/react";
 
-interface CodeEditorProps {
-  content: string;
-  onChange: (value: string | undefined) => void;
+interface CollaborativeCodeEditorProps {
+  documentId: string;
   readOnly?: boolean;
-  syncStatus?: 'synced' | 'syncing' | 'error';
+  token: string;
 }
 
-export default function CodeEditor({ content, onChange, readOnly, syncStatus = 'synced' }: CodeEditorProps) {
-  const { theme } = useTheme();
+const COLORS = [
+  "#958DF1",
+  "#F98181",
+  "#FBBC88",
+  "#FAF594",
+  "#70CFF8",
+  "#94FADB",
+  "#B9F18D",
+];
+
+export default function CollaborativeCodeEditor({
+  documentId,
+  readOnly = false,
+  token,
+}: CollaborativeCodeEditorProps) {
+  const { data: session } = useSession();
   const [output, setOutput] = useState<string | null>(null);
   const [input, setInput] = useState<string>("");
   const [isRunning, setIsRunning] = useState(false);
   const [isTerminalOpen, setIsTerminalOpen] = useState(true);
   const [language, setLanguage] = useState("javascript");
+  const [status, setStatus] = useState("connecting");
+  
+  const editorRef = useRef<any>(null);
+  const ydocRef = useRef<Y.Doc | null>(null);
+  const providerRef = useRef<HocuspocusProvider | null>(null);
+  const bindingRef = useRef<MonacoBinding | null>(null);
 
   const DEFAULT_SNIPPETS: Record<string, string> = {
     javascript: "// Start coding...\nconsole.log('Hello World');",
@@ -31,15 +54,76 @@ export default function CodeEditor({ content, onChange, readOnly, syncStatus = '
     rust: "// Start coding...\nfn main() {\n    println!(\"Hello World\");\n}",
   };
 
+  // Initialize Yjs and Hocuspocus
+  useEffect(() => {
+    const ydoc = new Y.Doc();
+    ydocRef.current = ydoc;
+
+    const wsUrl = process.env.NEXT_PUBLIC_WS_URL || "ws://localhost:4000";
+    const provider = new HocuspocusProvider({
+      url: `${wsUrl}?token=${token}`,
+      name: documentId,
+      document: ydoc,
+      onStatus: (event: { status: string }) => {
+        setStatus(event.status);
+      },
+    } as any);
+    providerRef.current = provider;
+
+    // Set up IndexedDB persistence for offline support
+    const indexeddbProvider = new IndexeddbPersistence(documentId, ydoc);
+
+    return () => {
+      bindingRef.current?.destroy();
+      provider.destroy();
+      indexeddbProvider.destroy();
+      ydoc.destroy();
+    };
+  }, [documentId, token]);
+
+  const handleEditorMount: OnMount = (editor, monaco) => {
+    editorRef.current = editor;
+
+    if (ydocRef.current && providerRef.current) {
+      const ytext = ydocRef.current.getText("monaco");
+
+      // Create Monaco binding for Yjs
+      const binding = new MonacoBinding(
+        ytext,
+        editor.getModel()!,
+        new Set([editor]),
+        providerRef.current.awareness
+      );
+      bindingRef.current = binding;
+
+      // Set user awareness
+      if (session?.user) {
+        providerRef.current.awareness?.setLocalStateField("user", {
+          name: session.user.name || "Anonymous",
+          color: COLORS[Math.floor(Math.random() * COLORS.length)],
+        });
+      }
+    }
+  };
+
   const handleLanguageChange = (newLanguage: string) => {
     setLanguage(newLanguage);
-    onChange(DEFAULT_SNIPPETS[newLanguage] || "");
+    if (editorRef.current && !readOnly) {
+      const model = editorRef.current.getModel();
+      if (model) {
+        model.setValue(DEFAULT_SNIPPETS[newLanguage] || "");
+      }
+    }
   };
 
   const handleRun = async () => {
+    if (!editorRef.current) return;
+    
     setIsRunning(true);
     setIsTerminalOpen(true);
     setOutput("Running...");
+
+    const code = editorRef.current.getValue();
 
     try {
       const response = await fetch("/api/execute", {
@@ -47,7 +131,7 @@ export default function CodeEditor({ content, onChange, readOnly, syncStatus = '
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           language,
-          code: content,
+          code,
           stdin: input,
         }),
       });
@@ -92,26 +176,24 @@ export default function CodeEditor({ content, onChange, readOnly, syncStatus = '
             <option value="rust">Rust</option>
           </select>
         </div>
-        
+
         <div className="flex items-center gap-3">
           {/* Sync Status Indicator */}
           <div className="flex items-center gap-2 px-3 py-1 bg-[#1e1e1e] rounded-full border border-[#3e3e3e]">
             <div className="relative">
               <div
                 className={`h-1.5 w-1.5 rounded-full transition-colors duration-500 ${
-                  syncStatus === 'synced'
+                  status === "connected"
                     ? "bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]"
-                    : syncStatus === 'syncing'
-                    ? "bg-yellow-500"
-                    : "bg-red-500"
+                    : "bg-yellow-500"
                 }`}
               />
-              {syncStatus === 'synced' && (
+              {status === "connected" && (
                 <div className="absolute inset-0 h-1.5 w-1.5 rounded-full bg-green-500 animate-ping opacity-75" />
               )}
             </div>
             <span className="text-[10px] font-medium text-[#a1a1aa] uppercase tracking-wider">
-              {syncStatus === 'synced' ? "Synced" : syncStatus === 'syncing' ? "Saving..." : "Error"}
+              {status === "connected" ? "Synced" : "Syncing"}
             </span>
           </div>
 
@@ -137,9 +219,8 @@ export default function CodeEditor({ content, onChange, readOnly, syncStatus = '
           defaultLanguage="javascript"
           language={language}
           defaultValue="// Start coding..."
-          value={content}
-          onChange={onChange}
           theme="vs-dark"
+          onMount={handleEditorMount}
           options={{
             readOnly,
             minimap: { enabled: true },
@@ -155,31 +236,41 @@ export default function CodeEditor({ content, onChange, readOnly, syncStatus = '
       </div>
 
       {/* Terminal Panel */}
-      <div 
+      <div
         className={`bg-[#1e1e1e] border-t border-[#3e3e3e] flex flex-col transition-all duration-300 ease-in-out ${
           isTerminalOpen ? "h-[35%]" : "h-10"
         }`}
       >
         {/* Terminal Header */}
-        <div 
+        <div
           className="flex items-center justify-between px-4 py-2 bg-[#252526] cursor-pointer hover:bg-[#2a2a2b]"
           onClick={() => setIsTerminalOpen(!isTerminalOpen)}
         >
           <div className="flex items-center gap-2 text-zinc-400">
             <Terminal size={14} />
-            <span className="text-xs font-medium uppercase tracking-wider">Terminal</span>
+            <span className="text-xs font-medium uppercase tracking-wider">
+              Terminal
+            </span>
           </div>
           <div className="flex items-center gap-2">
             {(output || input) && (
-              <button 
-                onClick={(e) => { e.stopPropagation(); setOutput(null); setInput(""); }}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setOutput(null);
+                  setInput("");
+                }}
                 className="p-1 hover:bg-[#3e3e3e] rounded text-zinc-500 hover:text-zinc-300"
                 title="Clear Console"
               >
                 <Trash2 size={12} />
               </button>
             )}
-            {isTerminalOpen ? <ChevronDown size={14} className="text-zinc-500" /> : <ChevronUp size={14} className="text-zinc-500" />}
+            {isTerminalOpen ? (
+              <ChevronDown size={14} className="text-zinc-500" />
+            ) : (
+              <ChevronUp size={14} className="text-zinc-500" />
+            )}
           </div>
         </div>
 
@@ -189,9 +280,11 @@ export default function CodeEditor({ content, onChange, readOnly, syncStatus = '
             {/* Input Section */}
             <div className="w-1/2 flex flex-col border-r border-[#3e3e3e]">
               <div className="flex items-center justify-between px-3 py-1.5 bg-[#2d2d2d] border-b border-[#3e3e3e]">
-                <span className="text-xs font-medium text-zinc-500 uppercase tracking-wider">Input (stdin)</span>
+                <span className="text-xs font-medium text-zinc-500 uppercase tracking-wider">
+                  Input (stdin)
+                </span>
                 {input && (
-                  <button 
+                  <button
                     onClick={() => setInput("")}
                     className="p-0.5 hover:bg-[#3e3e3e] rounded text-zinc-600 hover:text-zinc-400"
                     title="Clear Input"
@@ -212,9 +305,11 @@ export default function CodeEditor({ content, onChange, readOnly, syncStatus = '
             {/* Output Section */}
             <div className="w-1/2 flex flex-col">
               <div className="flex items-center justify-between px-3 py-1.5 bg-[#2d2d2d] border-b border-[#3e3e3e]">
-                <span className="text-xs font-medium text-zinc-500 uppercase tracking-wider">Output</span>
+                <span className="text-xs font-medium text-zinc-500 uppercase tracking-wider">
+                  Output
+                </span>
                 {output && (
-                  <button 
+                  <button
                     onClick={() => setOutput(null)}
                     className="p-0.5 hover:bg-[#3e3e3e] rounded text-zinc-600 hover:text-zinc-400"
                     title="Clear Output"

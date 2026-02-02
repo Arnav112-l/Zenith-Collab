@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
 import UserMenu from '@/components/UserMenu'
+import ThemeToggle from '@/components/ThemeToggle'
 import NoteCard from '@/components/NoteCard'
 import { FileText, Plus, Search, Archive, Menu, X, Folder, Trash2, Star, Settings, HelpCircle, LogOut } from 'lucide-react'
 import CreateDocumentModal from '@/components/CreateDocumentModal'
@@ -319,7 +320,10 @@ export default function Dashboard() {
           </button>
           <span className="font-bold text-lg">Zenith</span>
         </div>
-        <UserMenu />
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <UserMenu />
+        </div>
       </div>
 
       {/* Mobile Sidebar Overlay */}
@@ -379,7 +383,8 @@ export default function Dashboard() {
             </div>
             
             <div className="flex items-center gap-4 self-start md:self-auto">
-              <div className="hidden md:block">
+              <div className="hidden md:flex items-center gap-2">
+                <ThemeToggle />
                 <UserMenu />
               </div>
             </div>

@@ -1,0 +1,8 @@
+{
+  "servers": {
+    "Zenith-Collab Docs": {
+      "type": "sse",
+      "url": "https://gitmcp.io/Arnav112-l/Zenith-Collab"
+    }
+  }
+}

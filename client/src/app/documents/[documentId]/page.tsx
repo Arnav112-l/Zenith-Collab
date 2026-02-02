@@ -6,6 +6,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import UserMenu from '@/components/UserMenu'
+import ThemeToggle from '@/components/ThemeToggle'
 import jwt from 'jsonwebtoken'
 import { FileText, Clock, Code, Layout, PieChart, DollarSign, Trello, Calendar as CalendarIcon, Clock as ClockIcon, Target, Folder, Bot } from 'lucide-react'
 import Link from 'next/link'
@@ -90,7 +91,7 @@ export default async function DocumentPage({ params }: { params: Promise<{ docum
         {/* Main Content */}
         <div className="flex-1 flex flex-col min-w-0 relative z-10">
           {/* Floating Header */}
-          <header className="flex-shrink-0 px-6 pt-6 pb-2">
+          <header className="flex-shrink-0 px-6 pt-6 pb-2 relative z-50">
             <div className="flex items-center justify-between p-4 rounded-2xl bg-[#0a0a0a]/60 backdrop-blur-xl border border-[#27272a] shadow-lg">
               <div className="flex items-center gap-4 min-w-0">
                 <Link href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity flex-shrink-0 group">
@@ -126,6 +127,7 @@ export default async function DocumentPage({ params }: { params: Promise<{ docum
                 )}
                 
                 <div className="h-8 w-[1px] bg-[#27272a] mx-1" />
+                <ThemeToggle />
                 <UserMenu />
               </div>
             </div>
@@ -146,7 +148,8 @@ export default async function DocumentPage({ params }: { params: Promise<{ docum
                     <SpecializedEditorWrapper 
                       docType={docType} 
                       content={doc.content.toString()} 
-                      canEdit={canEdit} 
+                      canEdit={canEdit}
+                      documentId={documentId}
                     />
                   )}
                 </div>

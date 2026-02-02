@@ -110,10 +110,10 @@ export default function ShareButton({
       {isOpen && isOwner && (
         <>
           <div
-            className="fixed inset-0 z-10"
+            className="fixed inset-0 z-50"
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute right-0 mt-2 w-64 z-20 bg-[#1A1F2E] rounded-xl shadow-2xl border border-gray-800 overflow-hidden">
+          <div className="absolute right-0 mt-2 w-64 z-50 bg-[#1A1F2E] rounded-xl shadow-2xl border border-gray-800 backdrop-blur-none">
             <div className="p-2">
               <button
                 onClick={() => updateAccess("PRIVATE")}

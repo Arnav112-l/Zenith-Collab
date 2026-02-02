@@ -50,35 +50,42 @@ export async function PATCH(
     const { id } = await params
     const session = await getServerSession(authOptions)
 
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
     const json = await request.json()
-    const { title, isArchived, isTrash, isFavorite } = json
+    const { title, isArchived, isTrash, isFavorite, content } = json
 
-    // Check if user owns the document
+    // Check document and permissions
     const document = await prisma.document.findUnique({
       where: { id },
-      select: { userId: true }
+      select: { userId: true, publicAccess: true }
     })
 
     if (!document) {
       return NextResponse.json({ error: 'Document not found' }, { status: 404 })
     }
 
-    if (document.userId !== null && document.userId !== session.user.id) {
+    // Allow updates if:
+    // 1. User owns the document
+    // 2. Document has WRITE public access
+    // 3. Document has no owner (legacy)
+    const isOwner = session?.user?.id && document.userId === session.user.id
+    const hasWriteAccess = document.publicAccess === 'WRITE'
+    const noOwner = document.userId === null
+
+    if (!isOwner && !hasWriteAccess && !noOwner) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
+    // Build update data
+    const updateData: Record<string, unknown> = {}
+    if (title !== undefined) updateData.title = title
+    if (isArchived !== undefined) updateData.isArchived = isArchived
+    if (isTrash !== undefined) updateData.isTrash = isTrash
+    if (isFavorite !== undefined) updateData.isFavorite = isFavorite
+    if (content !== undefined) updateData.content = Buffer.from(content)
+
     const updated = await prisma.document.update({
       where: { id },
-      data: {
-        title,
-        isArchived,
-        isTrash,
-        isFavorite
-      }
+      data: updateData
     })
 
     return NextResponse.json(updated)

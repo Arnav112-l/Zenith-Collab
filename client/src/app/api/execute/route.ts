@@ -19,7 +19,7 @@ const LANGUAGE_MAP: Record<string, { language: string; version: string; file: st
 
 export async function POST(req: Request) {
     try {
-        const { language, code } = await req.json();
+        const { language, code, stdin } = await req.json();
 
         if (!language || !code) {
             return NextResponse.json(
@@ -50,6 +50,7 @@ export async function POST(req: Request) {
                         content: code,
                     },
                 ],
+                stdin: stdin || '',
             }),
         });
 
