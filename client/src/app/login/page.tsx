@@ -1,100 +1,89 @@
 "use client";
 
-import { signIn } from "next-auth/react";
-import { useState } from "react";
-import { FileText, Github } from "lucide-react";
-import Link from "next/link";
+import { signIn, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { Github, Loader2 } from "lucide-react";
 import Starfield from "@/components/Starfield";
 
 export default function LoginPage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
-  const loginWithGithub = async () => {
-    setIsLoading(true);
-    try {
-      await signIn("github", { callbackUrl: "/" });
-    } catch (error) {
-      console.error("Login failed:", error);
-    } finally {
-      setIsLoading(false);
+  useEffect(() => {
+    if (session) {
+      router.push("/dashboard");
     }
+  }, [session, router]);
+
+  const handleGitHubSignIn = async () => {
+    setIsLoading(true);
+    await signIn("github", { callbackUrl: "/dashboard" });
   };
 
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-white animate-spin" />
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-black text-white flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-black relative overflow-hidden">
       <Starfield />
       
-      <div className="w-full max-w-md relative z-10">
-        {/* Logo/Brand */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center mb-6">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#f472b6] to-[#ec4899] flex items-center justify-center shadow-[0_0_30px_rgba(244,114,182,0.3)]">
-              <FileText className="h-8 w-8 text-white" />
+      <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4">
+        <div className="w-full max-w-md">
+          {/* Logo */}
+          <div className="text-center mb-8">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-[#f472b6] to-[#a855f7] flex items-center justify-center shadow-lg shadow-purple-500/30">
+              <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
             </div>
+            <h1 className="text-3xl font-bold text-white mb-2">Welcome to Zenith</h1>
+            <p className="text-zinc-400">Sign in to access your collaborative workspace</p>
           </div>
-          <h1 className="text-4xl font-bold mb-3">
-            NoteP
-          </h1>
-          <p className="text-[#a1a1aa] text-lg">
-            Collaborative note taking made simple
-          </p>
-        </div>
 
-        {/* Login Card */}
-        <div className="bg-[#0a0a0a] rounded-2xl shadow-2xl p-8 border border-[#27272a] backdrop-blur-sm">
-          <div className="space-y-6">
-            <div className="text-center">
-              <h2 className="text-2xl font-bold text-white mb-2">
-                Welcome back
-              </h2>
-              <p className="text-sm text-[#a1a1aa]">
-                Sign in to continue to your documents
-              </p>
-            </div>
-
+          {/* Sign In Card */}
+          <div className="bg-zinc-900/50 backdrop-blur-xl border border-zinc-800 rounded-2xl p-8">
             <button
-              onClick={loginWithGithub}
+              onClick={handleGitHubSignIn}
               disabled={isLoading}
-              className="w-full flex items-center justify-center gap-3 px-6 py-3.5 bg-[#f472b6] text-white rounded-xl font-semibold hover:bg-[#ec4899] transition-all shadow-[0_0_20px_rgba(244,114,182,0.2)] hover:shadow-[0_0_25px_rgba(244,114,182,0.4)] disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-0.5"
+              className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-white text-black font-semibold rounded-xl hover:bg-zinc-100 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? (
-                <>
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />
-                  <span>Signing in...</span>
-                </>
+                <Loader2 className="w-5 h-5 animate-spin" />
               ) : (
-                <>
-                  <Github className="h-5 w-5" />
-                  <span>Continue with GitHub</span>
-                </>
+                <Github className="w-5 h-5" />
               )}
+              <span>Continue with GitHub</span>
             </button>
 
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-[#27272a]" />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-[#0a0a0a] text-[#52525b]">
-                  Secure authentication
-                </span>
-              </div>
+            <div className="mt-6 text-center">
+              <p className="text-xs text-zinc-500">
+                By signing in, you agree to our Terms of Service and Privacy Policy
+              </p>
             </div>
-
-            <p className="text-xs text-center text-[#52525b]">
-              By signing in, you agree to our terms of service and privacy policy
-            </p>
           </div>
-        </div>
 
-        {/* Back to Home */}
-        <div className="mt-8 text-center">
-          <Link
-            href="/"
-            className="text-sm text-[#a1a1aa] hover:text-white transition-colors inline-flex items-center gap-2 group"
-          >
-            <span className="group-hover:-translate-x-1 transition-transform">←</span> Back to home
-          </Link>
+          {/* Features */}
+          <div className="mt-8 grid grid-cols-3 gap-4 text-center">
+            <div className="p-4">
+              <div className="text-2xl mb-2">🚀</div>
+              <p className="text-xs text-zinc-400">Real-time Collaboration</p>
+            </div>
+            <div className="p-4">
+              <div className="text-2xl mb-2">📝</div>
+              <p className="text-xs text-zinc-400">Multiple Document Types</p>
+            </div>
+            <div className="p-4">
+              <div className="text-2xl mb-2">🔒</div>
+              <p className="text-xs text-zinc-400">Secure & Private</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>

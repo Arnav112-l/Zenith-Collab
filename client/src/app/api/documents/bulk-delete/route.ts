@@ -7,25 +7,33 @@ export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions)
     
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
     const { documentIds } = await request.json()
 
     if (!Array.isArray(documentIds) || documentIds.length === 0) {
       return NextResponse.json({ error: 'Invalid document IDs' }, { status: 400 })
     }
 
-    // First, check which documents the user owns or has no owner
+    // Check which documents the user owns or can delete
+    const whereClause: any = {
+      id: { in: documentIds },
+    }
+
+    // If logged in, filter by ownership; otherwise allow only ownerless docs
+    if (session?.user?.id) {
+      whereClause.OR = [
+        { userId: session.user.id },
+        { userId: null },
+        { publicAccess: 'WRITE' }
+      ]
+    } else {
+      whereClause.OR = [
+        { userId: null },
+        { publicAccess: 'WRITE' }
+      ]
+    }
+
     const documentsToDelete = await prisma.document.findMany({
-      where: {
-        id: { in: documentIds },
-        OR: [
-          { userId: session.user.id },
-          { userId: null } // Allow deletion of ownerless documents
-        ]
-      },
+      where: whereClause,
       select: { id: true }
     })
 

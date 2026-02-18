@@ -1,118 +1,105 @@
 "use client";
 
-import { useSession, signIn, signOut } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { User, LogOut, LogIn, ChevronDown, Sun, Moon } from "lucide-react";
 import { useTheme } from "next-themes";
+import Link from "next/link";
 
 export default function UserMenu() {
   const { data: session, status } = useSession();
   const [isOpen, setIsOpen] = useState(false);
-  const { theme, setTheme, resolvedTheme } = useTheme();
+  const { setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
-  // Prevent hydration mismatch
   useEffect(() => {
     setMounted(true);
   }, []);
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const toggleTheme = () => {
-    setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
+    setTheme(resolvedTheme === "dark" ? "light" : "dark");
   };
 
   if (status === "loading") {
     return (
-      <div className="h-9 w-9 animate-pulse rounded-full bg-gray-200 dark:bg-gray-700" />
+      <div className="w-10 h-10 rounded-full bg-zinc-700 animate-pulse" />
     );
   }
 
-  if (status === "authenticated" && session?.user) {
+  if (!session) {
     return (
-      <div className="relative">
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-        >
-          <div className="relative h-8 w-8 overflow-hidden rounded-full ring-2 ring-gray-200 dark:ring-gray-700">
-            {session.user.image ? (
-              <Image
-                src={session.user.image}
-                alt={session.user.name || "User"}
-                fill
-                sizes="32px"
-                className="object-cover"
-              />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600 text-sm font-bold text-white">
-                {session.user.name?.charAt(0).toUpperCase() || "U"}
-              </div>
-            )}
-          </div>
-          <ChevronDown className="h-4 w-4 text-gray-600 dark:text-gray-400 hidden sm:block" />
-        </button>
-
-        {isOpen && (
-          <>
-            <div
-              className="fixed inset-0 z-10"
-              onClick={() => setIsOpen(false)}
-            />
-            <div className="absolute right-0 mt-2 w-56 z-20 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
-              <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-                <div className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                  {session.user.name || "User"}
-                </div>
-                <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                  {session.user.email}
-                </div>
-              </div>
-              <div className="p-2">
-                {/* Theme Toggle */}
-                <button
-                  onClick={() => {
-                    toggleTheme();
-                  }}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                >
-                  {mounted && resolvedTheme === 'dark' ? (
-                    <>
-                      <Sun className="h-4 w-4" />
-                      <span>Light Mode</span>
-                    </>
-                  ) : (
-                    <>
-                      <Moon className="h-4 w-4" />
-                      <span>Dark Mode</span>
-                    </>
-                  )}
-                </button>
-                
-                <button
-                  onClick={() => {
-                    setIsOpen(false);
-                    signOut();
-                  }}
-                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-                >
-                  <LogOut className="h-4 w-4" />
-                  <span>Sign out</span>
-                </button>
-              </div>
-            </div>
-          </>
-        )}
-      </div>
+      <Link
+        href="/login"
+        className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all shadow-sm hover:shadow-md"
+      >
+        <LogIn className="h-4 w-4" />
+        <span>Sign In</span>
+      </Link>
     );
   }
 
   return (
-    <button
-      onClick={() => signIn()}
-      className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all shadow-sm hover:shadow-md"
-    >
-      <LogIn className="h-4 w-4" />
-      <span>Sign in</span>
-    </button>
+    <div className="relative" ref={menuRef}>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-2 p-1 rounded-full hover:bg-zinc-800 transition-colors"
+      >
+        {session.user?.image ? (
+          <Image
+            src={session.user.image}
+            alt={session.user.name || "User"}
+            width={36}
+            height={36}
+            className="rounded-full ring-2 ring-zinc-700"
+          />
+        ) : (
+          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+            <User className="w-5 h-5 text-white" />
+          </div>
+        )}
+        <ChevronDown className={`w-4 h-4 text-zinc-400 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+      </button>
+
+      {isOpen && (
+        <div className="absolute right-0 mt-2 w-56 bg-zinc-900 border border-zinc-800 rounded-xl shadow-xl py-2 z-50">
+          <div className="px-4 py-3 border-b border-zinc-800">
+            <p className="text-sm font-medium text-white truncate">{session.user?.name}</p>
+            <p className="text-xs text-zinc-500 truncate">{session.user?.email}</p>
+          </div>
+          
+          <button
+            onClick={toggleTheme}
+            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-zinc-300 hover:bg-zinc-800 transition-colors"
+          >
+            {mounted && resolvedTheme === "dark" ? (
+              <Sun className="w-4 h-4" />
+            ) : (
+              <Moon className="w-4 h-4" />
+            )}
+            <span>{mounted && resolvedTheme === "dark" ? "Light Mode" : "Dark Mode"}</span>
+          </button>
+          
+          <button
+            onClick={() => signOut({ callbackUrl: "/" })}
+            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-400 hover:bg-zinc-800 transition-colors"
+          >
+            <LogOut className="w-4 h-4" />
+            <span>Sign Out</span>
+          </button>
+        </div>
+      )}
+    </div>
   );
 }

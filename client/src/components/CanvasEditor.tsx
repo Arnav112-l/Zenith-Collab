@@ -134,22 +134,38 @@ export default function CanvasEditor({ content, onChange, readOnly }: CanvasEdit
     if (!canvas) return;
 
     const resizeCanvas = () => {
-      const rect = canvas.getBoundingClientRect();
-      canvas.width = rect.width;
-      canvas.height = rect.height;
+      const parent = canvas.parentElement;
+      if (!parent) return;
       
-      // Redraw after resize
+      const rect = parent.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      
+      // Set display size
+      canvas.style.width = `${rect.width}px`;
+      canvas.style.height = `${rect.height}px`;
+      
+      // Set actual size in memory (scaled for retina)
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      
+      // Scale context to match
       const ctx = canvas.getContext('2d');
       if (ctx) {
+        ctx.scale(dpr, dpr);
         ctx.fillStyle = '#1a1a1a';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillRect(0, 0, rect.width, rect.height);
         elements.forEach(element => drawElement(ctx, element));
       }
     };
 
-    resizeCanvas();
+    // Use setTimeout to ensure DOM is ready
+    const timeoutId = setTimeout(resizeCanvas, 100);
+    
     window.addEventListener('resize', resizeCanvas);
-    return () => window.removeEventListener('resize', resizeCanvas);
+    return () => {
+      window.removeEventListener('resize', resizeCanvas);
+      clearTimeout(timeoutId);
+    };
   }, [elements]);
 
   const drawElement = (ctx: CanvasRenderingContext2D, element: DrawElement) => {
@@ -326,9 +342,12 @@ export default function CanvasEditor({ content, onChange, readOnly }: CanvasEdit
     const canvas = canvasRef.current;
     if (!canvas) return { x: 0, y: 0 };
     const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const dpr = window.devicePixelRatio || 1;
     return {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
+      x: (e.clientX - rect.left) * scaleX / dpr,
+      y: (e.clientY - rect.top) * scaleY / dpr,
     };
   };
 
@@ -736,14 +755,25 @@ export default function CanvasEditor({ content, onChange, readOnly }: CanvasEdit
       )}
 
       {/* Canvas */}
-      <div className="flex-1 relative">
+      <div className="flex-1 relative min-h-0">
         <canvas
           ref={canvasRef}
-          className="absolute inset-0 w-full h-full cursor-crosshair"
+          className="absolute inset-0 w-full h-full cursor-crosshair touch-none"
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseUp}
+          onTouchStart={(e) => {
+            const touch = e.touches[0];
+            const mouseEvent = { clientX: touch.clientX, clientY: touch.clientY } as React.MouseEvent<HTMLCanvasElement>;
+            handleMouseDown(mouseEvent);
+          }}
+          onTouchMove={(e) => {
+            const touch = e.touches[0];
+            const mouseEvent = { clientX: touch.clientX, clientY: touch.clientY } as React.MouseEvent<HTMLCanvasElement>;
+            handleMouseMove(mouseEvent);
+          }}
+          onTouchEnd={handleMouseUp}
         />
       </div>
 

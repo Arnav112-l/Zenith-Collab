@@ -1,21 +1,16 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
 
 export async function GET(req: Request) {
   try {
-    const session = await getServerSession(authOptions)
+    // Auth removed: session logic deleted
     const { searchParams } = new URL(req.url)
     const type = searchParams.get('type') // 'trash', 'archive', 'favorites'
 
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
 
     const where: any = {
+      // No user filtering, return all documents (or add your own logic)
       OR: [
-        { userId: session?.user?.id || null },
         { publicAccess: { not: 'PRIVATE' } }
       ]
     }

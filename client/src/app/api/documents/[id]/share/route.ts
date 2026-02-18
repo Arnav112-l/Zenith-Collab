@@ -10,10 +10,6 @@ export async function PATCH(
     const session = await getServerSession(authOptions);
     const { id } = await params;
 
-    if (!session || !session.user) {
-        return new NextResponse("Unauthorized", { status: 401 });
-    }
-
     const json = await request.json();
     const { publicAccess } = json;
 
@@ -30,7 +26,11 @@ export async function PATCH(
             return new NextResponse("Not found", { status: 404 });
         }
 
-        if (doc.userId !== session.user.id) {
+        // Allow if user owns doc, or doc has no owner (public docs)
+        const isOwner = session?.user?.id && doc.userId === session.user.id;
+        const noOwner = doc.userId === null;
+
+        if (!isOwner && !noOwner) {
             return new NextResponse("Forbidden", { status: 403 });
         }
 

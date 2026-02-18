@@ -1,15 +1,10 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import * as Y from "yjs";
 
 export async function POST(req: Request) {
-    const session = await getServerSession(authOptions);
+    // Auth removed: session logic deleted
 
-    if (!session || !session.user) {
-        return new NextResponse("Unauthorized", { status: 401 });
-    }
 
     try {
         const body = await req.json();
@@ -38,7 +33,7 @@ export async function POST(req: Request) {
                 title: title || "Untitled Document",
                 type: type || "TEXT",
                 content: initialContent,
-                userId: session?.user?.id || null,
+                publicAccess: "WRITE", // Make documents visible
             },
         });
 

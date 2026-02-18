@@ -7,7 +7,6 @@ import * as Y from "yjs";
 import { HocuspocusProvider } from "@hocuspocus/provider";
 import { MonacoBinding } from "y-monaco";
 import { IndexeddbPersistence } from "y-indexeddb";
-import { useSession } from "next-auth/react";
 
 interface CollaborativeCodeEditorProps {
   documentId: string;
@@ -30,7 +29,7 @@ export default function CollaborativeCodeEditor({
   readOnly = false,
   token,
 }: CollaborativeCodeEditorProps) {
-  const { data: session } = useSession();
+  // Auth removed: session logic deleted
   const [output, setOutput] = useState<string | null>(null);
   const [input, setInput] = useState<string>("");
   const [isRunning, setIsRunning] = useState(false);
@@ -96,13 +95,11 @@ export default function CollaborativeCodeEditor({
       );
       bindingRef.current = binding;
 
-      // Set user awareness
-      if (session?.user) {
-        providerRef.current.awareness?.setLocalStateField("user", {
-          name: session.user.name || "Anonymous",
-          color: COLORS[Math.floor(Math.random() * COLORS.length)],
-        });
-      }
+      // Set user awareness to Anonymous
+      providerRef.current.awareness?.setLocalStateField("user", {
+        name: "Anonymous",
+        color: COLORS[Math.floor(Math.random() * COLORS.length)],
+      });
     }
   };
 

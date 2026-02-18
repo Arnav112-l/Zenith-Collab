@@ -1,12 +1,12 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
+import { useSession } from 'next-auth/react'
 import UserMenu from '@/components/UserMenu'
 import ThemeToggle from '@/components/ThemeToggle'
 import NoteCard from '@/components/NoteCard'
-import { FileText, Plus, Search, Archive, Menu, X, Folder, Trash2, Star, Settings, HelpCircle, LogOut } from 'lucide-react'
+import { FileText, Plus, Search, Archive, Menu, X, Folder, Trash2, Star, Settings, HelpCircle, LogOut, Loader2 } from 'lucide-react'
 import CreateDocumentModal from '@/components/CreateDocumentModal'
 import Starfield from '@/components/Starfield'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -148,7 +148,7 @@ const SidebarContent = ({
 
 export default function Dashboard() {
   const router = useRouter()
-  const { data: session } = useSession()
+  const { data: session, status } = useSession()
   const [documents, setDocuments] = useState<Document[]>([])
   const [currentView, setCurrentView] = useState<ViewType>('all')
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
@@ -157,6 +157,13 @@ export default function Dashboard() {
   const [searchQuery, setSearchQuery] = useState('')
   const [showSettings, setShowSettings] = useState(false)
   
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/login')
+    }
+  }, [status, router])
+
   // Confirmation Modal State
   const [confirmation, setConfirmation] = useState<{
     isOpen: boolean;
@@ -190,7 +197,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     void fetchDocuments()
-  }, [session, router, currentView])
+  }, [router, currentView])
 
   const createDocument = async () => {
     try {
@@ -305,6 +312,20 @@ export default function Dashboard() {
     doc.title.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
+  // Show loading while checking auth
+  if (status === 'loading') {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-[#f472b6] animate-spin" />
+      </div>
+    )
+  }
+
+  // Don't render if not authenticated (will redirect)
+  if (!session) {
+    return null
+  }
+
   return (
     <div className="min-h-screen bg-black text-zinc-100 selection:bg-purple-500/30 overflow-hidden">
       <Starfield />
@@ -369,7 +390,7 @@ export default function Dashboard() {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
             <div>
               <h1 className="text-3xl font-bold text-white mb-2 tracking-tight">
-                {currentView === 'all' && `Good ${new Date().getHours() < 12 ? 'Morning' : new Date().getHours() < 18 ? 'Afternoon' : 'Evening'}, ${session?.user?.name?.split(' ')[0] || "Guest"}`}
+                {currentView === 'all' && `Good ${new Date().getHours() < 12 ? 'Morning' : new Date().getHours() < 18 ? 'Afternoon' : 'Evening'}, ${session?.user?.name?.split(' ')[0] || 'there'}`}
                 {currentView === 'archive' && 'Archive'}
                 {currentView === 'trash' && 'Trash'}
                 {currentView === 'favorites' && 'Favorites'}
@@ -501,11 +522,11 @@ export default function Dashboard() {
                   <div className="flex items-center justify-between p-4 bg-[#171717] rounded-xl border border-[#27272a]">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full bg-[#f472b6] flex items-center justify-center font-bold text-white">
-                        {session?.user?.name?.charAt(0) || 'U'}
+                        {session?.user?.name?.charAt(0).toUpperCase() || 'U'}
                       </div>
                       <div>
                         <p className="font-medium">{session?.user?.name || 'User'}</p>
-                        <p className="text-xs text-zinc-500">{session?.user?.email}</p>
+                        <p className="text-xs text-zinc-500">{session?.user?.email || 'Not signed in'}</p>
                       </div>
                     </div>
                     <button className="px-3 py-1.5 text-xs font-medium bg-[#27272a] hover:bg-[#3f3f46] rounded-lg transition-colors">

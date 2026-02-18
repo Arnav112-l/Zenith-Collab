@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
 import { Sidebar, SidebarBody, SidebarLink, useSidebar } from "@/components/ui/sidebar";
 import { FileText, PlusCircle, Home, Trash2, CheckSquare, Square, FileType, Hash, Users, Clock, Folder, Search, Archive } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import CreateDocumentModal from "./CreateDocumentModal";

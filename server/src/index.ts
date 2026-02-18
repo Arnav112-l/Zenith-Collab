@@ -1,16 +1,10 @@
 import { Server } from '@hocuspocus/server'
 import { Database } from '@hocuspocus/extension-database'
 import { PrismaClient } from '@prisma/client'
-import express from 'express'
-import cors from 'cors'
 import jwt from 'jsonwebtoken'
 import { startEventScheduler } from './scheduler'
 
 const prisma = new PrismaClient()
-const app = express()
-
-app.use(cors({ origin: '*' }))
-app.use(express.json())
 
 // Start event notification scheduler
 startEventScheduler()
@@ -18,6 +12,7 @@ startEventScheduler()
 // Document creation is now handled by Next.js API (client/src/app/api/documents/route.ts)
 
 const hocuspocus = new Server({
+    port: 4000,
     extensions: [
         new Database({
             fetch: async ({ documentName }) => {
@@ -49,9 +44,9 @@ const hocuspocus = new Server({
             },
         }),
     ],
-    onAuthenticate: async (data) => {
-        const { documentName, requestParameters, connection } = data as any
-        let { token } = data as any
+    async onAuthenticate(data: any) {
+        const { documentName, requestParameters, connection } = data
+        let { token } = data
 
         console.log('DEBUG: onAuthenticate called for document:', documentName)
 
@@ -93,26 +88,16 @@ const hocuspocus = new Server({
             throw new Error('Unauthorized: Invalid token')
         }
     },
-    onChange: async (data) => {
+    async onChange(data: any) {
         console.log(`DEBUG: Document changed: ${data.documentName}, context: ${data.context}`)
     },
-    onConnect: (data) => {
+    async onConnect(data: any) {
         console.log('DEBUG: Client connected')
-        return Promise.resolve()
     },
-    onDisconnect: (data) => {
+    async onDisconnect(data: any) {
         console.log('DEBUG: Client disconnected')
-        return Promise.resolve()
     },
 })
 
-const server = app.listen(4000, '0.0.0.0', () => {
-    console.log('Server running on port 4000')
-})
-
-server.on('upgrade', (request, socket, head) => {
-    const wsServer = (hocuspocus as any).webSocketServer
-    wsServer.handleUpgrade(request, socket, head, (ws: any) => {
-        wsServer.emit('connection', ws, request)
-    })
-})
+hocuspocus.listen()
+console.log('Hocuspocus server running on port 4000')

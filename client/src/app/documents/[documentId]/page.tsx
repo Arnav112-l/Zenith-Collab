@@ -54,7 +54,8 @@ export default async function DocumentPage({ params }: { params: Promise<{ docum
     )
   }
 
-  const isOwner = (session?.user?.id === doc.userId) || (!session && doc.userId === null);
+  // isOwner: user owns it OR doc has no owner (public doc created before auth)
+  const isOwner = (session?.user?.id === doc.userId) || (doc.userId === null);
   const isPublic = doc.publicAccess !== 'PRIVATE'
   const canEdit = isOwner || doc.publicAccess === 'WRITE'
   const canView = isOwner || isPublic
@@ -111,19 +112,17 @@ export default async function DocumentPage({ params }: { params: Promise<{ docum
               </div>
 
               <div className="flex items-center gap-3">
+                <ShareButton 
+                  documentId={documentId} 
+                  initialAccess={doc.publicAccess} 
+                  isOwner={isOwner} 
+                />
+                
                 {isOwner && (
-                  <>
-                    <ShareButton 
-                      documentId={documentId} 
-                      initialAccess={doc.publicAccess} 
-                      isOwner={isOwner} 
-                    />
-                    
-                    <DeleteButton 
-                      documentId={documentId}
-                      isOwner={isOwner}
-                    />
-                  </>
+                  <DeleteButton 
+                    documentId={documentId}
+                    isOwner={isOwner}
+                  />
                 )}
                 
                 <div className="h-8 w-[1px] bg-[#27272a] mx-1" />

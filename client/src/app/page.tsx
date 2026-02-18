@@ -1,7 +1,6 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Check, Copy, Github } from 'lucide-react'
@@ -9,7 +8,6 @@ import Starfield from '@/components/Starfield'
 
 export default function Home() {
   const router = useRouter()
-  const { data: session } = useSession()
   const [copied, setCopied] = useState(false)
   const [installTab, setInstallTab] = useState('linux')
   const [benchmarkTab, setBenchmarkTab] = useState('realtime')
@@ -18,12 +16,6 @@ export default function Home() {
   
   const textOptions = ['collaborative editor', 'note-taking app', 'document workspace']
   const [currentOption, setCurrentOption] = useState(0)
-
-  // useEffect(() => {
-  //   if (session) {
-  //     router.push('/dashboard')
-  //   }
-  // }, [session, router])
 
   // Typing animation
   useEffect(() => {
@@ -125,7 +117,7 @@ export default function Home() {
           <div className="flex items-center gap-4">
             <Github className="w-5 h-5 text-white hover:text-[#f472b6] cursor-pointer transition-colors" />
             <button 
-              onClick={() => router.push('/dashboard')}
+              onClick={() => router.push('/login')}
               className="px-5 py-2 bg-[#f472b6] text-white text-sm font-semibold rounded-md hover:bg-[#ec4899] transition-colors"
             >
               Get Started
@@ -142,7 +134,7 @@ export default function Home() {
             <div className="space-y-8">
               {/* Version Badge */}
               <button
-                onClick={() => router.push('/dashboard')}
+                onClick={() => router.push('/login')}
                 className="inline-flex items-center gap-2 px-4 py-2 bg-[#1f2937] hover:bg-[#374151] text-sm text-[#d1d5db] rounded-full transition-colors"
               >
                 Zenith v1.0.0 is here! →

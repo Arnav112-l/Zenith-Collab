@@ -11,11 +11,7 @@ export async function DELETE(
     const { id } = await params
     const session = await getServerSession(authOptions)
 
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    // Check if user owns the document
+    // Check if document exists
     const document = await prisma.document.findUnique({
       where: { id },
       select: { userId: true }
@@ -25,8 +21,11 @@ export async function DELETE(
       return NextResponse.json({ error: 'Document not found' }, { status: 404 })
     }
 
-    // Allow deletion if user owns the document OR if document has no owner
-    if (document.userId !== null && document.userId !== session.user.id) {
+    // Allow deletion if user owns the document OR if document has no owner (public)
+    const isOwner = session?.user?.id && document.userId === session.user.id
+    const noOwner = document.userId === null
+
+    if (!isOwner && !noOwner) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 

@@ -9,10 +9,9 @@ import FontFamily from '@tiptap/extension-font-family'
 import Image from '@tiptap/extension-image'
 import * as Y from 'yjs'
 import { HocuspocusProvider } from '@hocuspocus/provider'
-import { IndexeddbPersistence } from 'y-indexeddb'
 import { useEffect, useState } from 'react'
-import EnhancedToolbar from './EnhancedToolbar'
 import { useSession } from 'next-auth/react'
+import EnhancedToolbar from './EnhancedToolbar'
 import jsPDF from 'jspdf'
 import { Document, Packer, Paragraph, TextRun } from 'docx'
 import { saveAs } from 'file-saver'
@@ -56,7 +55,7 @@ const TiptapEditor = ({
         provider: provider as any,
         user: {
           name: session?.user?.name || 'Anonymous',
-          color: COLORS[0], // Use deterministic color for initial render
+          color: COLORS[Math.floor(Math.random() * COLORS.length)],
         },
       }),
       TextStyle,
@@ -152,21 +151,17 @@ const Editor = ({ documentId, readOnly = false, token }: { documentId: string; r
         console.log('DEBUG: WebSocket Status:', event.status)
         setStatus(event.status)
       },
+      onSynced: () => {
+        console.log('DEBUG: Document synced with server')
+      },
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any)
 
-    // Avoid synchronous state update in effect
-    setTimeout(() => setProvider(wsProvider), 0)
-
-    // Set up IndexedDB Persistence (Offline Support)
-    const indexeddbProvider = new IndexeddbPersistence(documentId, ydoc)
-    indexeddbProvider.on('synced', () => {
-      console.log('DEBUG: Content loaded from IndexedDB')
-    })
+    // Set provider immediately for real-time sync
+    setProvider(wsProvider)
 
     return () => {
       wsProvider.destroy()
-      indexeddbProvider.destroy()
     }
   }, [ydoc, documentId, token])
 
