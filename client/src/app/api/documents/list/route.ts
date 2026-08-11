@@ -1,21 +1,25 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { corsPreflight, getRequestUser, withCors } from '@/lib/mobile-auth'
+
+export async function OPTIONS(req: Request) {
+  return corsPreflight(req)
+}
 
 export async function GET(req: Request) {
   try {
-    // Auth removed: session logic deleted
+    const user = await getRequestUser(req)
     const { searchParams } = new URL(req.url)
-    const type = searchParams.get('type') // 'trash', 'archive', 'favorites'
+    const type = searchParams.get('type')
 
-
-    const where: any = {
-      // No user filtering, return all documents (or add your own logic)
-      OR: [
-        { publicAccess: { not: 'PRIVATE' } }
-      ]
+    if (!user?.id) {
+      return withCors(NextResponse.json({ error: 'Unauthorized' }, { status: 401 }), req)
     }
 
-    // Default filter: Not trash, not archived
+    const where: Record<string, unknown> = {
+      userId: user.id,
+    }
+
     if (!type) {
       where.isTrash = false
       where.isArchived = false
@@ -33,7 +37,7 @@ export async function GET(req: Request) {
     const documents = await prisma.document.findMany({
       where,
       orderBy: {
-        updatedAt: 'desc'
+        updatedAt: 'desc',
       },
       select: {
         id: true,
@@ -44,12 +48,13 @@ export async function GET(req: Request) {
         isArchived: true,
         isTrash: true,
         isFavorite: true,
-      }
+        type: true,
+      },
     })
 
-    return NextResponse.json(documents)
+    return withCors(NextResponse.json(documents), req)
   } catch (error) {
     console.error('Failed to fetch documents:', error)
-    return NextResponse.json({ error: 'Failed to fetch documents' }, { status: 500 })
+    return withCors(NextResponse.json({ error: 'Failed to fetch documents' }, { status: 500 }), req)
   }
 }

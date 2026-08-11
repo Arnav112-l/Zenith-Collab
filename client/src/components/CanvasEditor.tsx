@@ -513,14 +513,14 @@ export default function CanvasEditor({ content, onChange, readOnly }: CanvasEdit
     <div className="h-full w-full bg-[#1a1a1a] relative overflow-hidden flex flex-col">
       {/* Toolbar */}
       {!readOnly && (
-        <div className="flex items-center gap-3 px-4 py-3 bg-[#1A1F2E] border-b border-[#27272a]">
+        <div className="flex items-center gap-3 px-4 py-3 bg-[#1A1F2E] border-b border-[var(--border)]">
           {/* Image Section */}
           <div className="flex flex-col items-center">
             <div className="flex items-center gap-1 mb-1">
               <button
                 onClick={handleUndo}
                 disabled={historyStep <= 0}
-                className="p-2 text-gray-400 hover:bg-[#27272a] hover:text-white rounded transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                className="p-2 text-[var(--muted)] hover:bg-[var(--surface-2)] hover:text-[var(--foreground)] rounded transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                 title="Undo"
               >
                 <Undo className="w-4 h-4" />
@@ -528,7 +528,7 @@ export default function CanvasEditor({ content, onChange, readOnly }: CanvasEdit
               <button
                 onClick={handleRedo}
                 disabled={historyStep >= history.length - 1}
-                className="p-2 text-gray-400 hover:bg-[#27272a] hover:text-white rounded transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                className="p-2 text-[var(--muted)] hover:bg-[var(--surface-2)] hover:text-[var(--foreground)] rounded transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                 title="Redo"
               >
                 <Redo className="w-4 h-4" />
@@ -544,27 +544,27 @@ export default function CanvasEditor({ content, onChange, readOnly }: CanvasEdit
             <div className="flex items-center gap-1 mb-1">
               <button
                 onClick={() => setTool('pen')}
-                className={`p-2 rounded transition-all ${tool === 'pen' ? 'bg-[#f472b6] text-white' : 'text-gray-400 hover:bg-[#27272a] hover:text-white'}`}
+                className={`p-2 rounded transition-all ${tool === 'pen' ? 'bg-[#f472b6] text-white' : 'text-[var(--muted)] hover:bg-[var(--surface-2)] hover:text-white'}`}
                 title="Pen"
               >
                 <Pen className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setTool('eraser')}
-                className={`p-2 rounded transition-all ${tool === 'eraser' ? 'bg-[#f472b6] text-white' : 'text-gray-400 hover:bg-[#27272a] hover:text-white'}`}
+                className={`p-2 rounded transition-all ${tool === 'eraser' ? 'bg-[#f472b6] text-white' : 'text-[var(--muted)] hover:bg-[var(--surface-2)] hover:text-white'}`}
                 title="Eraser"
               >
                 <Eraser className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setTool('text')}
-                className={`p-2 rounded transition-all ${tool === 'text' ? 'bg-[#f472b6] text-white' : 'text-gray-400 hover:bg-[#27272a] hover:text-white'}`}
+                className={`p-2 rounded transition-all ${tool === 'text' ? 'bg-[#f472b6] text-white' : 'text-[var(--muted)] hover:bg-[var(--surface-2)] hover:text-white'}`}
                 title="Text"
               >
                 <Type className="w-4 h-4" />
               </button>
               <button
-                className="p-2 text-gray-400 hover:bg-[#27272a] hover:text-white rounded transition-all"
+                className="p-2 text-[var(--muted)] hover:bg-[var(--surface-2)] hover:text-[var(--foreground)] rounded transition-all"
                 title="Zoom"
               >
                 <Search className="w-4 h-4" />
@@ -579,14 +579,14 @@ export default function CanvasEditor({ content, onChange, readOnly }: CanvasEdit
           <div className="flex flex-col items-center">
             <div className="flex items-center gap-1 mb-1">
               <button
-                className="p-2 text-gray-400 hover:bg-[#27272a] hover:text-white rounded transition-all"
+                className="p-2 text-[var(--muted)] hover:bg-[var(--surface-2)] hover:text-[var(--foreground)] rounded transition-all"
                 title="Brush"
               >
                 <Brush className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setTool('select')}
-                className={`p-2 rounded transition-all ${tool === 'select' ? 'bg-[#f472b6] text-white' : 'text-gray-400 hover:bg-[#27272a] hover:text-white'}`}
+                className={`p-2 rounded transition-all ${tool === 'select' ? 'bg-[#f472b6] text-white' : 'text-[var(--muted)] hover:bg-[var(--surface-2)] hover:text-white'}`}
                 title="Select"
               >
                 <MousePointer2 className="w-4 h-4" />
@@ -602,42 +602,42 @@ export default function CanvasEditor({ content, onChange, readOnly }: CanvasEdit
             <div className="grid grid-cols-6 gap-1 mb-1">
               <button
                 onClick={() => setTool('line')}
-                className={`p-1.5 rounded transition-all ${tool === 'line' ? 'bg-[#f472b6] text-white' : 'text-gray-400 hover:bg-[#27272a] hover:text-white'}`}
+                className={`p-1.5 rounded transition-all ${tool === 'line' ? 'bg-[#f472b6] text-white' : 'text-[var(--muted)] hover:bg-[var(--surface-2)] hover:text-white'}`}
                 title="Line"
               >
                 <Minus className="w-3.5 h-3.5" />
               </button>
               <button
                 onClick={() => setTool('pen')}
-                className={`p-1.5 rounded transition-all ${tool === 'pen' ? 'bg-[#f472b6] text-white' : 'text-gray-400 hover:bg-[#27272a] hover:text-white'}`}
+                className={`p-1.5 rounded transition-all ${tool === 'pen' ? 'bg-[#f472b6] text-white' : 'text-[var(--muted)] hover:bg-[var(--surface-2)] hover:text-white'}`}
                 title="Freehand"
               >
                 <Pen className="w-3.5 h-3.5" />
               </button>
               <button
                 onClick={() => setTool('circle')}
-                className={`p-1.5 rounded transition-all ${tool === 'circle' ? 'bg-[#f472b6] text-white' : 'text-gray-400 hover:bg-[#27272a] hover:text-white'}`}
+                className={`p-1.5 rounded transition-all ${tool === 'circle' ? 'bg-[#f472b6] text-white' : 'text-[var(--muted)] hover:bg-[var(--surface-2)] hover:text-white'}`}
                 title="Circle"
               >
                 <Circle className="w-3.5 h-3.5" />
               </button>
               <button
                 onClick={() => setTool('rectangle')}
-                className={`p-1.5 rounded transition-all ${tool === 'rectangle' ? 'bg-[#f472b6] text-white' : 'text-gray-400 hover:bg-[#27272a] hover:text-white'}`}
+                className={`p-1.5 rounded transition-all ${tool === 'rectangle' ? 'bg-[#f472b6] text-white' : 'text-[var(--muted)] hover:bg-[var(--surface-2)] hover:text-white'}`}
                 title="Rectangle"
               >
                 <Square className="w-3.5 h-3.5" />
               </button>
               <button
                 onClick={() => setTool('rectangle')}
-                className={`p-1.5 rounded transition-all text-gray-400 hover:bg-[#27272a] hover:text-white`}
+                className={`p-1.5 rounded transition-all text-[var(--muted)] hover:bg-[var(--surface-2)] hover:text-[var(--foreground)]`}
                 title="Rounded Rectangle"
               >
                 <Square className="w-3.5 h-3.5 rounded" />
               </button>
               <button
                 onClick={() => setTool('triangle')}
-                className={`p-1.5 rounded transition-all ${tool === 'triangle' ? 'bg-[#f472b6] text-white' : 'text-gray-400 hover:bg-[#27272a] hover:text-white'}`}
+                className={`p-1.5 rounded transition-all ${tool === 'triangle' ? 'bg-[#f472b6] text-white' : 'text-[var(--muted)] hover:bg-[var(--surface-2)] hover:text-white'}`}
                 title="Triangle"
               >
                 <Triangle className="w-3.5 h-3.5" />
@@ -645,42 +645,42 @@ export default function CanvasEditor({ content, onChange, readOnly }: CanvasEdit
               
               <button
                 onClick={() => setTool('arrow')}
-                className={`p-1.5 rounded transition-all ${tool === 'arrow' ? 'bg-[#f472b6] text-white' : 'text-gray-400 hover:bg-[#27272a] hover:text-white'}`}
+                className={`p-1.5 rounded transition-all ${tool === 'arrow' ? 'bg-[#f472b6] text-white' : 'text-[var(--muted)] hover:bg-[var(--surface-2)] hover:text-white'}`}
                 title="Left Arrow"
               >
                 <ArrowRight className="w-3.5 h-3.5 rotate-180" />
               </button>
               <button
                 onClick={() => setTool('arrow')}
-                className={`p-1.5 rounded transition-all ${tool === 'arrow' ? 'bg-[#f472b6] text-white' : 'text-gray-400 hover:bg-[#27272a] hover:text-white'}`}
+                className={`p-1.5 rounded transition-all ${tool === 'arrow' ? 'bg-[#f472b6] text-white' : 'text-[var(--muted)] hover:bg-[var(--surface-2)] hover:text-white'}`}
                 title="Up Arrow"
               >
                 <ArrowRight className="w-3.5 h-3.5 -rotate-90" />
               </button>
               <button
                 onClick={() => setTool('arrow')}
-                className={`p-1.5 rounded transition-all ${tool === 'arrow' ? 'bg-[#f472b6] text-white' : 'text-gray-400 hover:bg-[#27272a] hover:text-white'}`}
+                className={`p-1.5 rounded transition-all ${tool === 'arrow' ? 'bg-[#f472b6] text-white' : 'text-[var(--muted)] hover:bg-[var(--surface-2)] hover:text-white'}`}
                 title="Down Arrow"
               >
                 <ArrowRight className="w-3.5 h-3.5 rotate-90" />
               </button>
               <button
                 onClick={() => setTool('star')}
-                className={`p-1.5 rounded transition-all ${tool === 'star' ? 'bg-[#f472b6] text-white' : 'text-gray-400 hover:bg-[#27272a] hover:text-white'}`}
+                className={`p-1.5 rounded transition-all ${tool === 'star' ? 'bg-[#f472b6] text-white' : 'text-[var(--muted)] hover:bg-[var(--surface-2)] hover:text-white'}`}
                 title="Star"
               >
                 <Star className="w-3.5 h-3.5" />
               </button>
               <button
                 onClick={() => setTool('pentagon')}
-                className={`p-1.5 rounded transition-all ${tool === 'pentagon' ? 'bg-[#f472b6] text-white' : 'text-gray-400 hover:bg-[#27272a] hover:text-white'}`}
+                className={`p-1.5 rounded transition-all ${tool === 'pentagon' ? 'bg-[#f472b6] text-white' : 'text-[var(--muted)] hover:bg-[var(--surface-2)] hover:text-white'}`}
                 title="Pentagon"
               >
                 <Pentagon className="w-3.5 h-3.5" />
               </button>
               <button
                 onClick={() => setTool('hexagon')}
-                className={`p-1.5 rounded transition-all ${tool === 'hexagon' ? 'bg-[#f472b6] text-white' : 'text-gray-400 hover:bg-[#27272a] hover:text-white'}`}
+                className={`p-1.5 rounded transition-all ${tool === 'hexagon' ? 'bg-[#f472b6] text-white' : 'text-[var(--muted)] hover:bg-[var(--surface-2)] hover:text-white'}`}
                 title="Hexagon"
               >
                 <Hexagon className="w-3.5 h-3.5" />
@@ -688,19 +688,19 @@ export default function CanvasEditor({ content, onChange, readOnly }: CanvasEdit
               
               <button
                 onClick={() => setTool('arrow')}
-                className={`p-1.5 rounded transition-all ${tool === 'arrow' ? 'bg-[#f472b6] text-white' : 'text-gray-400 hover:bg-[#27272a] hover:text-white'}`}
+                className={`p-1.5 rounded transition-all ${tool === 'arrow' ? 'bg-[#f472b6] text-white' : 'text-[var(--muted)] hover:bg-[var(--surface-2)] hover:text-white'}`}
                 title="Right Arrow"
               >
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
               <button
                 onClick={() => setTool('ellipse')}
-                className={`p-1.5 rounded transition-all ${tool === 'ellipse' ? 'bg-[#f472b6] text-white' : 'text-gray-400 hover:bg-[#27272a] hover:text-white'}`}
+                className={`p-1.5 rounded transition-all ${tool === 'ellipse' ? 'bg-[#f472b6] text-white' : 'text-[var(--muted)] hover:bg-[var(--surface-2)] hover:text-white'}`}
                 title="Ellipse"
               >
                 <Circle className="w-3.5 h-3.5 scale-x-150" />
               </button>
-              <button className="p-1.5 rounded transition-all text-gray-400 hover:bg-[#27272a] hover:text-white" title="More">
+              <button className="p-1.5 rounded transition-all text-[var(--muted)] hover:bg-[var(--surface-2)] hover:text-[var(--foreground)]" title="More">
                 <span className="text-xs">...</span>
               </button>
             </div>
@@ -716,7 +716,7 @@ export default function CanvasEditor({ content, onChange, readOnly }: CanvasEdit
                 <button
                   key={c}
                   onClick={() => setColor(c)}
-                  className={`w-5 h-5 rounded-sm border transition-all hover:scale-110 ${color === c ? 'border-2 border-[#f472b6] ring-2 ring-[#f472b6]/30' : 'border-[#27272a]'}`}
+                  className={`w-5 h-5 rounded-sm border transition-all hover:scale-110 ${color === c ? 'border-2 border-[#f472b6] ring-2 ring-[#f472b6]/30' : 'border-[var(--border)]'}`}
                   style={{ backgroundColor: c }}
                   title={c}
                 />
@@ -731,21 +731,21 @@ export default function CanvasEditor({ content, onChange, readOnly }: CanvasEdit
           <div className="flex items-center gap-1">
             <button
               onClick={handleClear}
-              className="p-2 text-gray-400 hover:bg-red-500 hover:text-white rounded transition-all"
+              className="p-2 text-[var(--muted)] hover:bg-red-500 hover:text-[var(--foreground)] rounded transition-all"
               title="Clear Canvas"
             >
               <Trash2 className="w-4 h-4" />
             </button>
             <button
               onClick={handleImport}
-              className="p-2 text-gray-400 hover:bg-[#27272a] hover:text-white rounded transition-all"
+              className="p-2 text-[var(--muted)] hover:bg-[var(--surface-2)] hover:text-[var(--foreground)] rounded transition-all"
               title="Import"
             >
               <Upload className="w-4 h-4" />
             </button>
             <button
               onClick={handleExport}
-              className="p-2 text-gray-400 hover:bg-[#27272a] hover:text-white rounded transition-all"
+              className="p-2 text-[var(--muted)] hover:bg-[var(--surface-2)] hover:text-[var(--foreground)] rounded transition-all"
               title="Export PNG"
             >
               <Download className="w-4 h-4" />
@@ -779,7 +779,7 @@ export default function CanvasEditor({ content, onChange, readOnly }: CanvasEdit
 
       {/* Save Indicator */}
       {lastSaved && !readOnly && (
-        <div className="absolute bottom-4 right-4 z-[100] px-4 py-2 bg-[#1A1F2E] border border-[#27272a] rounded-lg text-sm text-gray-400 flex items-center gap-2 shadow-lg">
+        <div className="absolute bottom-4 right-4 z-[100] px-4 py-2 bg-[#1A1F2E] border border-[var(--border)] rounded-lg text-sm text-[var(--muted)] flex items-center gap-2 shadow-lg">
           <Save className="w-4 h-4 text-green-400" />
           Saved at {lastSaved.toLocaleTimeString()}
         </div>

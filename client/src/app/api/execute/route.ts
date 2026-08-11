@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
+import { corsPreflight, getRequestUser, withCors } from '@/lib/mobile-auth';
 
 const PISTON_API = 'https://emkc.org/api/v2/piston/execute';
 
-// Map our editor languages to Piston languages and versions
 const LANGUAGE_MAP: Record<string, { language: string; version: string; file: string }> = {
     javascript: { language: 'javascript', version: '18.15.0', file: 'index.js' },
     typescript: { language: 'typescript', version: '5.0.3', file: 'index.ts' },
@@ -17,40 +17,47 @@ const LANGUAGE_MAP: Record<string, { language: string; version: string; file: st
     swift: { language: 'swift', version: '5.3.3', file: 'main.swift' },
 };
 
+const MAX_CODE_LENGTH = 100_000;
+const MAX_STDIN_LENGTH = 10_000;
+
+export async function OPTIONS(req: Request) {
+    return corsPreflight(req);
+}
+
 export async function POST(req: Request) {
     try {
+        const user = await getRequestUser(req);
+        if (!user?.id) {
+            return withCors(NextResponse.json({ error: 'Unauthorized' }, { status: 401 }), req);
+        }
+
         const { language, code, stdin } = await req.json();
 
-        if (!language || !code) {
-            return NextResponse.json(
-                { error: 'Language and code are required' },
-                { status: 400 }
-            );
+        if (!language || typeof code !== 'string') {
+            return withCors(NextResponse.json({ error: 'Language and code are required' }, { status: 400 }), req);
+        }
+
+        if (code.length > MAX_CODE_LENGTH) {
+            return withCors(NextResponse.json({ error: 'Code exceeds maximum length' }, { status: 400 }), req);
+        }
+
+        if (typeof stdin === 'string' && stdin.length > MAX_STDIN_LENGTH) {
+            return withCors(NextResponse.json({ error: 'stdin exceeds maximum length' }, { status: 400 }), req);
         }
 
         const config = LANGUAGE_MAP[language];
         if (!config) {
-            return NextResponse.json(
-                { error: `Unsupported language: ${language}` },
-                { status: 400 }
-            );
+            return withCors(NextResponse.json({ error: `Unsupported language: ${language}` }, { status: 400 }), req);
         }
 
         const response = await fetch(PISTON_API, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 language: config.language,
                 version: config.version,
-                files: [
-                    {
-                        name: config.file,
-                        content: code,
-                    },
-                ],
-                stdin: stdin || '',
+                files: [{ name: config.file, content: code }],
+                stdin: typeof stdin === 'string' ? stdin : '',
             }),
         });
 
@@ -59,12 +66,9 @@ export async function POST(req: Request) {
         }
 
         const data = await response.json();
-        return NextResponse.json(data);
+        return withCors(NextResponse.json(data), req);
     } catch (error) {
         console.error('Execution error:', error);
-        return NextResponse.json(
-            { error: 'Failed to execute code' },
-            { status: 500 }
-        );
+        return withCors(NextResponse.json({ error: 'Failed to execute code' }, { status: 500 }), req);
     }
 }

@@ -1,105 +1,138 @@
-"use client";
+'use client'
 
-import { useSession, signOut } from "next-auth/react";
-import Image from "next/image";
-import { useState, useEffect, useRef } from "react";
-import { User, LogOut, LogIn, ChevronDown, Sun, Moon } from "lucide-react";
-import { useTheme } from "next-themes";
-import Link from "next/link";
+import { useSession, signOut } from 'next-auth/react'
+import Image from 'next/image'
+import { useEffect, useRef, useState } from 'react'
+import { User, LogOut, LogIn, ChevronDown, Monitor, Moon, Sun } from 'lucide-react'
+import { useTheme } from 'next-themes'
+import Link from 'next/link'
+import { AnimatePresence, motion } from 'framer-motion'
 
 export default function UserMenu() {
-  const { data: session, status } = useSession();
-  const [isOpen, setIsOpen] = useState(false);
-  const { setTheme, resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
+  const { data: session, status } = useSession()
+  const [isOpen, setIsOpen] = useState(false)
+  const { theme, setTheme, resolvedTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
+    setMounted(true)
+  }, [])
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
+        setIsOpen(false)
       }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
-  const toggleTheme = () => {
-    setTheme(resolvedTheme === "dark" ? "light" : "dark");
-  };
-
-  if (status === "loading") {
-    return (
-      <div className="w-10 h-10 rounded-full bg-zinc-700 animate-pulse" />
-    );
+  if (status === 'loading') {
+    return <div className="w-10 h-10 rounded-full bg-[var(--surface-2)] animate-pulse" />
   }
 
   if (!session) {
     return (
-      <Link
-        href="/login"
-        className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all shadow-sm hover:shadow-md"
-      >
+      <Link href="/login" className="ui-btn-primary">
         <LogIn className="h-4 w-4" />
         <span>Sign In</span>
       </Link>
-    );
+    )
   }
+
+  const themeOptions = [
+    { id: 'light', label: 'Light', icon: Sun },
+    { id: 'dark', label: 'Dark', icon: Moon },
+    { id: 'system', label: 'System', icon: Monitor },
+  ] as const
 
   return (
     <div className="relative" ref={menuRef}>
       <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 p-1 rounded-full hover:bg-zinc-800 transition-colors"
+        type="button"
+        onClick={() => setIsOpen((v) => !v)}
+        className="ui-btn !rounded-full !pl-1 !pr-2 !py-1"
+        aria-expanded={isOpen}
+        aria-haspopup="menu"
       >
         {session.user?.image ? (
           <Image
             src={session.user.image}
-            alt={session.user.name || "User"}
-            width={36}
-            height={36}
-            className="rounded-full ring-2 ring-zinc-700"
+            alt={session.user.name || 'User'}
+            width={32}
+            height={32}
+            className="rounded-full"
           />
         ) : (
-          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-            <User className="w-5 h-5 text-white" />
+          <div className="w-8 h-8 rounded-full bg-[var(--accent-soft)] text-[var(--accent)] flex items-center justify-center">
+            <User className="w-4 h-4" />
           </div>
         )}
-        <ChevronDown className={`w-4 h-4 text-zinc-400 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+        <ChevronDown className={`w-4 h-4 text-[var(--muted)] transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
-      {isOpen && (
-        <div className="absolute right-0 mt-2 w-56 bg-zinc-900 border border-zinc-800 rounded-xl shadow-xl py-2 z-50">
-          <div className="px-4 py-3 border-b border-zinc-800">
-            <p className="text-sm font-medium text-white truncate">{session.user?.name}</p>
-            <p className="text-xs text-zinc-500 truncate">{session.user?.email}</p>
-          </div>
-          
-          <button
-            onClick={toggleTheme}
-            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-zinc-300 hover:bg-zinc-800 transition-colors"
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: 8, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 8, scale: 0.98 }}
+            transition={{ duration: 0.16 }}
+            className="ui-popover absolute right-0 mt-2 w-64 z-50 p-2"
+            role="menu"
           >
-            {mounted && resolvedTheme === "dark" ? (
-              <Sun className="w-4 h-4" />
-            ) : (
-              <Moon className="w-4 h-4" />
+            <div className="px-3 py-2.5 mb-1">
+              <p className="text-sm font-semibold truncate">{session.user?.name}</p>
+              <p className="text-xs ui-muted truncate">{session.user?.email}</p>
+            </div>
+
+            <div className="ui-divider my-1" />
+
+            <p className="px-3 pt-2 pb-1 text-[11px] font-semibold uppercase tracking-wider ui-muted">
+              Appearance
+            </p>
+            <div className="grid grid-cols-3 gap-1 p-1 mb-1">
+              {themeOptions.map(({ id, label, icon: Icon }) => {
+                const active = mounted && theme === id
+                return (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => setTheme(id)}
+                    className={`flex flex-col items-center gap-1 rounded-xl px-2 py-2 text-[11px] font-medium transition-colors ${
+                      active
+                        ? 'bg-[var(--accent-soft)] text-[var(--accent)]'
+                        : 'ui-muted hover:bg-[var(--surface-2)] hover:text-[var(--foreground)]'
+                    }`}
+                  >
+                    <Icon className="w-4 h-4" />
+                    {label}
+                  </button>
+                )
+              })}
+            </div>
+
+            <div className="ui-divider my-1" />
+
+            <button
+              type="button"
+              onClick={() => signOut({ callbackUrl: '/' })}
+              className="ui-menu-item !text-[var(--danger)] hover:!bg-red-500/10"
+            >
+              <LogOut className="w-4 h-4 mt-0.5" />
+              <span className="text-sm font-medium">Sign Out</span>
+            </button>
+
+            {mounted && (
+              <p className="px-3 py-2 text-[10px] ui-muted">
+                Using {resolvedTheme} theme
+              </p>
             )}
-            <span>{mounted && resolvedTheme === "dark" ? "Light Mode" : "Dark Mode"}</span>
-          </button>
-          
-          <button
-            onClick={() => signOut({ callbackUrl: "/" })}
-            className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-400 hover:bg-zinc-800 transition-colors"
-          >
-            <LogOut className="w-4 h-4" />
-            <span>Sign Out</span>
-          </button>
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
-  );
+  )
 }

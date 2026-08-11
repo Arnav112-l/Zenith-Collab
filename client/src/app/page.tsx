@@ -5,6 +5,8 @@ import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Check, Copy, Github } from 'lucide-react'
 import Starfield from '@/components/Starfield'
+import ThemeToggle from '@/components/ThemeToggle'
+import { Stagger, StaggerItem, fadeIn, fadeUp } from '@/components/motion'
 
 export default function Home() {
   const router = useRouter()
@@ -59,8 +61,8 @@ export default function Home() {
 
   const copyInstallCommand = () => {
     const commands = {
-      linux: 'curl -fsSL https://zenith.sh/install | bash',
-      windows: 'powershell -c "irm zenith.sh/install.ps1 | iex"'
+      linux: 'git clone https://github.com/Arnav112-l/Zenith-Collab.git && cd Zenith-Collab/client && npm install',
+      windows: 'git clone https://github.com/Arnav112-l/Zenith-Collab.git; cd Zenith-Collab/client; npm install',
     }
     navigator.clipboard.writeText(commands[installTab as keyof typeof commands])
     setCopied(true)
@@ -93,57 +95,67 @@ export default function Home() {
   const maxTime = Math.max(...benchmarkData[benchmarkTab as keyof typeof benchmarkData].map(d => d.time))
 
   return (
-    <div className="min-h-screen bg-black text-white overflow-x-hidden">
+    <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] overflow-x-hidden">
       {/* Starfield Background */}
       <Starfield />
 
       {/* Navigation Bar */}
-      <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-black/70 border-b border-[#27272a]">
+      <motion.nav
+        className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-[color-mix(in_srgb,var(--background)_80%,transparent)] border-b border-[var(--border)]"
+        initial="hidden"
+        animate="show"
+        variants={fadeIn}
+      >
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#f472b6] to-[#ec4899] flex items-center justify-center font-bold text-lg">
-              N
+              Z
             </div>
             <span className="font-bold text-xl">Zenith</span>
           </div>
           
           <div className="hidden md:flex items-center gap-8 text-sm">
-            <a href="#" className="text-[#a1a1aa] hover:text-white transition-colors font-medium">Docs</a>
-            <a href="#" className="text-[#a1a1aa] hover:text-white transition-colors font-medium">Reference</a>
-            <a href="#" className="text-[#a1a1aa] hover:text-white transition-colors font-medium">Guides</a>
-            <a href="#" className="text-[#a1a1aa] hover:text-white transition-colors font-medium">Blog</a>
+            <a href="#" className="text-[var(--muted)] hover:text-[var(--foreground)] transition-colors font-medium">Docs</a>
+            <a href="#" className="text-[var(--muted)] hover:text-[var(--foreground)] transition-colors font-medium">Reference</a>
+            <a href="#" className="text-[var(--muted)] hover:text-[var(--foreground)] transition-colors font-medium">Guides</a>
+            <a href="#" className="text-[var(--muted)] hover:text-[var(--foreground)] transition-colors font-medium">Blog</a>
           </div>
 
           <div className="flex items-center gap-4">
-            <Github className="w-5 h-5 text-white hover:text-[#f472b6] cursor-pointer transition-colors" />
-            <button 
+            <ThemeToggle />
+            <Github className="w-5 h-5 text-[var(--foreground)] hover:text-[var(--accent)] cursor-pointer transition-colors" />
+            <motion.button 
               onClick={() => router.push('/login')}
-              className="px-5 py-2 bg-[#f472b6] text-white text-sm font-semibold rounded-md hover:bg-[#ec4899] transition-colors"
+              className="ui-btn-primary !rounded-md"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.97 }}
             >
               Get Started
-            </button>
+            </motion.button>
           </div>
         </div>
-      </nav>
+      </motion.nav>
 
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-16 items-start">
             {/* Left Side */}
-            <div className="space-y-8">
+            <Stagger className="space-y-8">
               {/* Version Badge */}
-              <button
-                onClick={() => router.push('/login')}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-[#1f2937] hover:bg-[#374151] text-sm text-[#d1d5db] rounded-full transition-colors"
-              >
-                Zenith v1.0.0 is here! →
-              </button>
+              <StaggerItem>
+                <button
+                  onClick={() => router.push('/login')}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-[#1f2937] hover:bg-[#374151] text-sm text-[#d1d5db] rounded-full transition-colors"
+                >
+                  Zenith v1.0.0 is here! →
+                </button>
+              </StaggerItem>
 
               {/* Hero Headline */}
-              <div>
+              <StaggerItem>
                 <h1 className="text-6xl md:text-7xl font-bold leading-tight mb-4">
-                  Zenith is a <span className="italic text-[#f472b6]">fast</span> JavaScript
+                  Zenith is a <span className="italic text-[#f472b6]">fast</span> collaborative
                 </h1>
                 <div className="flex items-center gap-3">
                   <h1 className="text-6xl md:text-7xl font-bold">
@@ -151,19 +163,19 @@ export default function Home() {
                     <span className={`inline-block w-1 h-16 ml-1 bg-white align-middle ${showCursor ? 'opacity-100' : 'opacity-0'}`} />
                   </h1>
                 </div>
-              </div>
+              </StaggerItem>
 
               {/* Description */}
-              <p className="text-lg text-[#a1a1aa] leading-relaxed max-w-xl">
-                Zenith is a fast, <span className="font-semibold text-white">incrementally adoptable</span> all-in-one JavaScript, 
-                TypeScript & collaborative editing toolkit. Use individual tools like <code className="px-2 py-0.5 bg-[#1a1a1a] rounded text-sm font-mono">zenith edit</code> or{' '}
-                <code className="px-2 py-0.5 bg-[#1a1a1a] rounded text-sm font-mono">zenith share</code> in your projects, 
-                or adopt the complete stack with a fast editor, real-time sync, and document sharing built in.
-              </p>
+              <StaggerItem>
+                <p className="text-lg text-[var(--muted)] leading-relaxed max-w-xl">
+                  Zenith is a real-time collaborative workspace for notes, code, whiteboards, kanban boards, and more.
+                  Edit together with live cursors, share documents with fine-grained permissions, and keep everything synced across your team.
+                </p>
+              </StaggerItem>
 
-              {/* Install Section */}
-              <div>
-                <h3 className="text-xl font-bold mb-4">Install Zenith v1.0.0</h3>
+              {/* Quick Start */}
+              <StaggerItem>
+                <h3 className="text-xl font-bold mb-4">Quick Start</h3>
                 
                 {/* Tabs */}
                 <div className="flex gap-0 mb-0">
@@ -172,7 +184,7 @@ export default function Home() {
                     className={`px-6 py-2.5 text-sm font-medium transition-colors border-b-2 ${
                       installTab === 'linux'
                         ? 'bg-[#1a1a1a] text-white border-[#f472b6]'
-                        : 'bg-[#0a0a0a] text-[#6b7280] border-transparent hover:text-white'
+                        : 'bg-[var(--surface)] text-[#6b7280] border-transparent hover:text-[var(--foreground)]'
                     }`}
                   >
                     Linux & macOS
@@ -182,12 +194,12 @@ export default function Home() {
                     className={`px-6 py-2.5 text-sm font-medium transition-colors border-b-2 ${
                       installTab === 'windows'
                         ? 'bg-[#1a1a1a] text-white border-[#f472b6]'
-                        : 'bg-[#0a0a0a] text-[#6b7280] border-transparent hover:text-white'
+                        : 'bg-[var(--surface)] text-[#6b7280] border-transparent hover:text-[var(--foreground)]'
                     }`}
                   >
                     Windows
                   </button>
-                  <button className="px-6 py-2.5 text-sm font-medium bg-[#0a0a0a] text-[#6b7280] hover:text-white transition-colors border-b-2 border-transparent">
+                  <button className="px-6 py-2.5 text-sm font-medium bg-[var(--surface)] text-[#6b7280] hover:text-[var(--foreground)] transition-colors border-b-2 border-transparent">
                     View install script
                   </button>
                 </div>
@@ -207,15 +219,13 @@ export default function Home() {
                       >
                         {installTab === 'linux' ? (
                           <>
-                            <span className="text-[#fbbf24]">powershell</span>{' '}
-                            <span className="text-[#60a5fa]">-c</span>{' '}
-                            <span className="text-[#a78bfa]">"irm bun.sh/install.ps1 | iex"</span>
+                            <span className="text-[#fbbf24]">git clone</span>{' '}
+                            <span className="text-[#a78bfa]">https://github.com/Arnav112-l/Zenith-Collab.git</span>
                           </>
                         ) : (
                           <>
-                            <span className="text-[#fbbf24]">powershell</span>{' '}
-                            <span className="text-[#60a5fa]">-c</span>{' '}
-                            <span className="text-[#a78bfa]">"irm bun.sh/install.ps1 | iex"</span>
+                            <span className="text-[#fbbf24]">git clone</span>{' '}
+                            <span className="text-[#a78bfa]">https://github.com/Arnav112-l/Zenith-Collab.git</span>
                           </>
                         )}
                       </motion.code>
@@ -223,29 +233,35 @@ export default function Home() {
                   </div>
                   <button
                     onClick={copyInstallCommand}
-                    className="p-2 hover:bg-[#27272a] rounded transition-colors flex-shrink-0"
+                    className="p-2 hover:bg-[var(--surface-2)] rounded transition-colors flex-shrink-0"
                   >
                     {copied ? (
                       <Check className="w-4 h-4 text-[#4ade80]" />
                     ) : (
-                      <Copy className="w-4 h-4 text-[#6b7280] hover:text-white" />
+                      <Copy className="w-4 h-4 text-[#6b7280] hover:text-[var(--foreground)]" />
                     )}
                   </button>
                 </div>
-              </div>
-            </div>
+              </StaggerItem>
+            </Stagger>
 
             {/* Right Side - Benchmark */}
-            <div className="lg:sticky lg:top-32">
-              <div className="bg-[#0a0a0a] border border-[#27272a] rounded-xl overflow-hidden">
+            <motion.div
+              className="lg:sticky lg:top-32"
+              initial="hidden"
+              animate="show"
+              variants={fadeUp}
+              transition={{ delay: 0.2 }}
+            >
+              <div className="bg-[var(--surface)] border border-[var(--border)] rounded-xl overflow-hidden">
                 {/* Tabs */}
-                <div className="flex border-b border-[#27272a] bg-[#0f0f0f]">
+                <div className="flex border-b border-[var(--border)] bg-[#0f0f0f]">
                   <button
                     onClick={() => setBenchmarkTab('realtime')}
                     className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
                       benchmarkTab === 'realtime'
-                        ? 'text-[#f472b6] bg-[#0a0a0a] border-b-2 border-[#f472b6]'
-                        : 'text-[#6b7280] hover:text-white'
+                        ? 'text-[#f472b6] bg-[var(--surface)] border-b-2 border-[#f472b6]'
+                        : 'text-[#6b7280] hover:text-[var(--foreground)]'
                     }`}
                   >
                     Real-time
@@ -254,8 +270,8 @@ export default function Home() {
                     onClick={() => setBenchmarkTab('sync')}
                     className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
                       benchmarkTab === 'sync'
-                        ? 'text-[#f472b6] bg-[#0a0a0a] border-b-2 border-[#f472b6]'
-                        : 'text-[#6b7280] hover:text-white'
+                        ? 'text-[#f472b6] bg-[var(--surface)] border-b-2 border-[#f472b6]'
+                        : 'text-[#6b7280] hover:text-[var(--foreground)]'
                     }`}
                   >
                     Sync Speed
@@ -264,8 +280,8 @@ export default function Home() {
                     onClick={() => setBenchmarkTab('load')}
                     className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
                       benchmarkTab === 'load'
-                        ? 'text-[#f472b6] bg-[#0a0a0a] border-b-2 border-[#f472b6]'
-                        : 'text-[#6b7280] hover:text-white'
+                        ? 'text-[#f472b6] bg-[var(--surface)] border-b-2 border-[#f472b6]'
+                        : 'text-[#6b7280] hover:text-[var(--foreground)]'
                     }`}
                   >
                     Load Time
@@ -316,7 +332,7 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>

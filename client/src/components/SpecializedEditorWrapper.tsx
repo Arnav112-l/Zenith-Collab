@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, ReactNode } from 'react'
 import dynamic from 'next/dynamic'
-import CodeEditor from '@/components/CodeEditor'
+import { PageEnter } from '@/components/motion'
 
 // Dynamic imports for editors that use browser-only APIs
 const CollaborativeCodeEditor = dynamic(() => import('@/components/CollaborativeCodeEditor'), { ssr: false })
@@ -22,6 +22,10 @@ interface SpecializedEditorWrapperProps {
   canEdit: boolean;
   documentId: string;
   token?: string;
+}
+
+function EditorEntrance({ children }: { children: ReactNode }) {
+  return <PageEnter className="relative h-full">{children}</PageEnter>
 }
 
 export default function SpecializedEditorWrapper({ docType, content: initialContent, canEdit, documentId, token }: SpecializedEditorWrapperProps) {
@@ -80,7 +84,7 @@ export default function SpecializedEditorWrapper({ docType, content: initialCont
 
   // Sync status indicator
   const SyncIndicator = () => (
-    <div className="absolute top-4 right-4 z-10 flex items-center gap-2 px-3 py-1.5 bg-[#0a0a0a]/50 backdrop-blur-md rounded-full shadow-lg border border-[#27272a]/50">
+    <div className="absolute top-4 right-4 z-10 flex items-center gap-2 px-3 py-1.5 ui-panel backdrop-blur-md rounded-full">
       <div className="relative">
         <div className={`h-1.5 w-1.5 rounded-full transition-colors duration-500 ${
           syncStatus === 'synced' ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]' : 
@@ -90,7 +94,7 @@ export default function SpecializedEditorWrapper({ docType, content: initialCont
           <div className="absolute inset-0 h-1.5 w-1.5 rounded-full bg-green-500 animate-ping opacity-75" />
         )}
       </div>
-      <span className="text-[10px] font-medium text-[#a1a1aa] uppercase tracking-wider">
+      <span className="text-[10px] font-medium ui-muted uppercase tracking-wider">
         {syncStatus === 'synced' ? 'Synced' : syncStatus === 'syncing' ? 'Saving...' : 'Error'}
       </span>
     </div>
@@ -104,79 +108,90 @@ export default function SpecializedEditorWrapper({ docType, content: initialCont
 
   switch (docType) {
     case 'CODE':
-      // Use regular editor with auto-save - sync indicator is built into CodeEditor toolbar
+      if (!token) {
+        return (
+          <EditorEntrance>
+            <div className="p-8 ui-muted">Missing collaboration token for code editor.</div>
+          </EditorEntrance>
+        )
+      }
       return (
-        <CodeEditor 
-          content={content}
-          onChange={handleChange}
-          readOnly={!canEdit}
-          syncStatus={syncStatus}
-        />
+        <EditorEntrance>
+          <CollaborativeCodeEditor
+            documentId={documentId}
+            readOnly={!canEdit}
+            token={token}
+          />
+        </EditorEntrance>
       )
     case 'CANVAS':
       return (
-        <div className="relative h-full">
+        <EditorEntrance>
           <SyncIndicator />
           <CanvasEditor {...editorProps} onChange={(val) => handleChange(val)} />
-        </div>
+        </EditorEntrance>
       )
     case 'BUDGET':
       return (
-        <div className="relative h-full">
+        <EditorEntrance>
           <SyncIndicator />
           <BudgetEditor {...editorProps} onChange={(val) => handleChange(val)} />
-        </div>
+        </EditorEntrance>
       )
     case 'EXPENSE':
       return (
-        <div className="relative h-full">
+        <EditorEntrance>
           <SyncIndicator />
           <ExpenseEditor {...editorProps} onChange={(val) => handleChange(val)} />
-        </div>
+        </EditorEntrance>
       )
     case 'KANBAN':
       return (
-        <div className="relative h-full">
+        <EditorEntrance>
           <SyncIndicator />
           <KanbanEditor {...editorProps} onChange={(val) => handleChange(val)} />
-        </div>
+        </EditorEntrance>
       )
     case 'CALENDAR':
       return (
-        <div className="relative h-full">
+        <EditorEntrance>
           <SyncIndicator />
           <CalendarEditor {...editorProps} onChange={(val) => handleChange(val)} />
-        </div>
+        </EditorEntrance>
       )
     case 'TIMETRACKER':
       return (
-        <div className="relative h-full">
+        <EditorEntrance>
           <SyncIndicator />
           <TimeTrackerEditor {...editorProps} onChange={(val) => handleChange(val)} />
-        </div>
+        </EditorEntrance>
       )
     case 'GOALS':
       return (
-        <div className="relative h-full">
+        <EditorEntrance>
           <SyncIndicator />
           <GoalsEditor {...editorProps} onChange={(val) => handleChange(val)} />
-        </div>
+        </EditorEntrance>
       )
     case 'FILES':
       return (
-        <div className="relative h-full">
+        <EditorEntrance>
           <SyncIndicator />
           <FileManagerEditor {...editorProps} onChange={(val) => handleChange(val)} />
-        </div>
+        </EditorEntrance>
       )
     case 'AI':
       return (
-        <div className="relative h-full">
+        <EditorEntrance>
           <SyncIndicator />
           <AIAssistantEditor {...editorProps} onChange={(val) => handleChange(val)} />
-        </div>
+        </EditorEntrance>
       )
     default:
-      return <div>Unsupported document type: {docType}</div>
+      return (
+        <EditorEntrance>
+          <div>Unsupported document type: {docType}</div>
+        </EditorEntrance>
+      )
   }
 }

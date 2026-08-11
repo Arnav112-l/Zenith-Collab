@@ -17,6 +17,8 @@ import {
   X 
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { AnimatePresence, motion } from "framer-motion";
+import { Stagger, StaggerItem, fadeIn, scaleIn } from "@/components/motion";
 
 interface CreateDocumentModalProps {
   isOpen: boolean;
@@ -36,6 +38,7 @@ const documentTypes = [
   { id: "TIMETRACKER", name: "Time Tracker", icon: Clock, description: "Track time on tasks" },
   { id: "GOALS", name: "Goals", icon: Target, description: "Set and track goals" },
   { id: "FILES", name: "Files", icon: Folder, description: "File manager & storage" },
+  { id: "AI", name: "AI Assistant", icon: Bot, description: "Chat with an AI helper" },
 ];
 
 export default function CreateDocumentModal({ isOpen, onClose, initialType = "TEXT", onSubmit }: CreateDocumentModalProps) {
@@ -58,8 +61,6 @@ export default function CreateDocumentModal({ isOpen, onClose, initialType = "TE
       setTitle("");
     }
   }, [isOpen, initialType]);
-
-  if (!isOpen || !mounted) return null;
 
   const handleCreate = async () => {
     if (!title.trim()) return;
@@ -90,75 +91,107 @@ export default function CreateDocumentModal({ isOpen, onClose, initialType = "TE
     }
   };
 
+  if (!mounted) return null;
+
   return createPortal(
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-      <div className="w-full max-w-4xl bg-[#0a0a0a] border border-[#27272a] rounded-xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
-        <div className="p-6 border-b border-[#27272a] flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-white">Create New Notebook</h2>
-          <button onClick={onClose} className="text-[#a1a1aa] hover:text-white">
-            <X size={24} />
-          </button>
-        </div>
-
-        <div className="p-6 overflow-y-auto flex-1">
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-[#a1a1aa] mb-2">
-              Notebook Name
-            </label>
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Enter notebook name..."
-              className="w-full px-4 py-2 bg-[#27272a] border border-[#3f3f46] rounded-lg text-white focus:outline-none focus:border-[#f472b6] transition-colors"
-              autoFocus
-            />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {documentTypes.map((type) => (
-              <button
-                key={type.id}
-                onClick={() => setSelectedType(type.id)}
-                className={`p-4 rounded-xl border text-left transition-all ${
-                  selectedType === type.id
-                    ? "bg-[#f472b6]/10 border-[#f472b6] ring-1 ring-[#f472b6]"
-                    : "bg-[#27272a]/50 border-[#3f3f46] hover:bg-[#27272a] hover:border-[#52525b]"
-                }`}
-              >
-                <div className={`p-2 rounded-lg inline-block mb-3 ${
-                  selectedType === type.id ? "bg-[#f472b6] text-white" : "bg-[#27272a] text-[#a1a1aa]"
-                }`}>
-                  <type.icon size={24} />
-                </div>
-                <h3 className={`font-medium mb-1 ${
-                  selectedType === type.id ? "text-white" : "text-[#e4e4e7]"
-                }`}>
-                  {type.name}
-                </h3>
-                <p className="text-sm text-[#a1a1aa]">{type.description}</p>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="p-6 border-t border-[#27272a] flex justify-end gap-3">
-          <button
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          key="create-document-modal"
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          <motion.div
+            className="absolute inset-0 bg-black/50 dark:bg-black/80 backdrop-blur-sm"
+            initial="hidden"
+            animate="show"
+            exit="hidden"
+            variants={fadeIn}
             onClick={onClose}
-            className="px-4 py-2 text-[#e4e4e7] hover:bg-[#27272a] rounded-lg transition-colors"
+          />
+
+          <motion.div
+            className="relative w-full max-w-4xl ui-panel rounded-xl overflow-hidden max-h-[90vh] flex flex-col"
+            initial="hidden"
+            animate="show"
+            exit="hidden"
+            variants={scaleIn}
           >
-            Cancel
-          </button>
-          <button
-            onClick={handleCreate}
-            disabled={!title.trim() || isLoading}
-            className="px-6 py-2 bg-[#f472b6] text-white font-medium rounded-lg hover:bg-[#ec4899] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            {isLoading ? "Creating..." : "Create Notebook"}
-          </button>
-        </div>
-      </div>
-    </div>,
+            <div className="p-6 border-b border-[var(--border)] flex items-center justify-between">
+              <h2 className="text-xl font-semibold text-[var(--foreground)]">Create New Notebook</h2>
+              <button onClick={onClose} className="ui-btn-ghost">
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="p-6 overflow-y-auto flex-1">
+              <div className="mb-6">
+                <label className="block text-sm font-medium ui-muted mb-2">
+                  Notebook Name
+                </label>
+                <input
+                  type="text"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="Enter notebook name..."
+                  className="ui-input"
+                  autoFocus
+                />
+              </div>
+
+              <Stagger className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {documentTypes.map((type) => (
+                  <StaggerItem key={type.id}>
+                    <button
+                      onClick={() => setSelectedType(type.id)}
+                      data-active={selectedType === type.id}
+                      className="ui-menu-item flex-col items-start w-full p-4"
+                    >
+                      <div className={`p-2 rounded-lg inline-block mb-3 ${
+                        selectedType === type.id
+                          ? "bg-[var(--accent)] text-white"
+                          : "bg-[var(--surface-2)] ui-muted"
+                      }`}>
+                        <type.icon size={24} />
+                      </div>
+                      <h3 className={`font-medium mb-1 ${
+                        selectedType === type.id
+                          ? "text-[var(--accent)]"
+                          : "text-[var(--foreground)]"
+                      }`}>
+                        {type.name}
+                      </h3>
+                      <p className="text-sm ui-muted">{type.description}</p>
+                    </button>
+                  </StaggerItem>
+                ))}
+              </Stagger>
+            </div>
+
+            <div className="p-6 border-t border-[var(--border)] flex justify-end gap-3">
+              <button
+                onClick={onClose}
+                className="ui-btn"
+              >
+                Cancel
+              </button>
+              <motion.button
+                onClick={handleCreate}
+                disabled={!title.trim() || isLoading}
+                className="ui-btn-primary px-6 disabled:opacity-50 disabled:cursor-not-allowed"
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+              >
+                {isLoading ? "Creating..." : "Create Notebook"}
+              </motion.button>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>,
     document.body
   );
 }

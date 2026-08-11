@@ -13,7 +13,7 @@ A real-time collaborative workspace with multiple document types, built with Nex
 - **Multiple Document Types**:
   - 📝 **Rich Text Editor** - TipTap-powered editor with formatting options
   - 💻 **Code Editor** - Monaco editor with syntax highlighting and multi-language support
-  - 🎨 **Canvas/Whiteboard** - Excalidraw-powered collaborative drawing
+  - 🎨 **Canvas/Whiteboard** - Custom collaborative-ready drawing canvas
   - 📊 **Kanban Board** - Drag-and-drop task management
   - 📅 **Calendar** - Event scheduling with email reminders
   - 💰 **Budget Tracker** - Financial planning and tracking
@@ -33,7 +33,7 @@ A real-time collaborative workspace with multiple document types, built with Nex
 - **Styling**: Tailwind CSS
 - **Rich Text**: TipTap
 - **Code Editor**: Monaco Editor
-- **Canvas**: Excalidraw
+- **Canvas**: Custom HTML5 canvas editor
 - **Real-time**: Hocuspocus Provider + Yjs
 - **Auth**: NextAuth.js
 - **ORM**: Prisma
@@ -52,6 +52,8 @@ A real-time collaborative workspace with multiple document types, built with Nex
 
 ```
 zenith-collab/
+├── prisma/                 # Shared Prisma schema (source of truth)
+├── scripts/                # Sync helpers (e.g. prisma)
 ├── client/                 # Next.js frontend
 │   ├── src/
 │   │   ├── app/           # App router pages & API routes
@@ -59,13 +61,13 @@ zenith-collab/
 │   │   ├── contexts/      # React contexts
 │   │   ├── lib/           # Utilities & configurations
 │   │   └── types/         # TypeScript definitions
-│   └── prisma/            # Prisma schema
+│   └── prisma/            # Synced Prisma schema copy
 ├── server/                 # Hocuspocus backend
 │   ├── src/
 │   │   ├── index.ts       # Server entry point
 │   │   ├── email.ts       # Email service
 │   │   └── scheduler.ts   # Cron job scheduler
-│   └── prisma/            # Prisma schema
+│   └── prisma/            # Synced Prisma schema copy
 └── README.md
 ```
 
@@ -118,13 +120,13 @@ NEXTAUTH_SECRET="your-secret-key"
 NEXTAUTH_URL="http://localhost:3000"
 GITHUB_ID="your-github-client-id"
 GITHUB_SECRET="your-github-client-secret"
-NEXT_PUBLIC_WS_URL="ws://localhost:1234"
+NEXT_PUBLIC_WS_URL="ws://localhost:4000"
 ```
 
 **Server** (`server/.env`):
 ```env
 DATABASE_URL="mongodb+srv://..."
-PORT=1234
+PORT=4000
 EMAIL_USER="your-email@gmail.com"
 EMAIL_PASS="your-gmail-app-password"
 ```
@@ -202,6 +204,8 @@ Callback URL: https://your-app.vercel.app/api/auth/callback/github
 | `GITHUB_ID` | GitHub OAuth Client ID |
 | `GITHUB_SECRET` | GitHub OAuth Client Secret |
 | `NEXT_PUBLIC_WS_URL` | WebSocket server URL |
+| `OPENAI_API_KEY` | Optional OpenAI key for AI Assistant docs |
+| `OPENAI_MODEL` | Optional model override (default `gpt-4o-mini`) |
 
 ### Server
 

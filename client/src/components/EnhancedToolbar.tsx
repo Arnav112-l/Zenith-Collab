@@ -73,9 +73,9 @@ export default function EnhancedToolbar({ editor, onExport }: EnhancedToolbarPro
 
   return (
     <div className="sticky top-4 z-20 w-full max-w-5xl mx-auto mb-6">
-      <div className="flex flex-wrap items-center gap-2 px-3 py-2 bg-[#0a0a0a]/60 backdrop-blur-xl border border-[#27272a] rounded-2xl shadow-2xl">
+      <div className="flex flex-wrap items-center gap-2 px-3 py-2 bg-[color-mix(in_srgb,var(--surface)_70%,transparent)] backdrop-blur-xl border border-[var(--border)] rounded-2xl shadow-2xl">
         {/* Text Formatting Group */}
-        <div className="flex items-center gap-0.5 bg-[#27272a]/50 rounded-xl p-1 border border-white/5">
+        <div className="flex items-center gap-0.5 bg-[var(--surface-2)] rounded-xl p-1 border border-[var(--border)]">
           <ToggleButton
             onClick={() => editor.chain().focus().toggleBold().run()}
             isActive={editor.isActive("bold")}
@@ -99,7 +99,7 @@ export default function EnhancedToolbar({ editor, onExport }: EnhancedToolbarPro
           </ToggleButton>
         </div>
 
-        <div className="w-px h-6 bg-white/10 mx-1" />
+        <div className="w-px h-6 bg-[var(--border)] mx-1" />
 
         {/* Font Controls */}
         <div className="flex items-center gap-0.5">
@@ -119,7 +119,7 @@ export default function EnhancedToolbar({ editor, onExport }: EnhancedToolbarPro
                       editor.chain().focus().setFontFamily(font.value).run();
                       setShowFontFamily(false);
                     }}
-                    className="px-4 py-2.5 text-left text-sm rounded-lg hover:bg-[#f472b6]/10 hover:text-[#f472b6] transition-colors text-gray-300"
+                    className="px-4 py-2.5 text-left text-sm rounded-lg hover:bg-[#f472b6]/10 hover:text-[#f472b6] transition-colors text-[var(--muted-strong)]"
                     style={{ fontFamily: font.value }}
                   >
                     {font.name}
@@ -155,7 +155,7 @@ export default function EnhancedToolbar({ editor, onExport }: EnhancedToolbarPro
                       }
                       setShowFontSize(false);
                     }}
-                    className="px-3 py-2 text-sm rounded-lg hover:bg-[#f472b6]/10 hover:text-[#f472b6] whitespace-nowrap font-medium transition-colors text-gray-300"
+                    className="px-3 py-2 text-sm rounded-lg hover:bg-[#f472b6]/10 hover:text-[#f472b6] whitespace-nowrap font-medium transition-colors text-[var(--muted-strong)]"
                   >
                     {size}
                   </button>
@@ -165,7 +165,7 @@ export default function EnhancedToolbar({ editor, onExport }: EnhancedToolbarPro
           </div>
         </div>
 
-        <div className="w-px h-6 bg-white/10 mx-1" />
+        <div className="w-px h-6 bg-[var(--border)] mx-1" />
 
         {/* Colors */}
         <div className="flex items-center gap-0.5">
@@ -224,10 +224,10 @@ export default function EnhancedToolbar({ editor, onExport }: EnhancedToolbarPro
           </div>
         </div>
 
-        <div className="w-px h-6 bg-white/10 mx-1" />
+        <div className="w-px h-6 bg-[var(--border)] mx-1" />
 
         {/* Headings Group */}
-        <div className="flex items-center gap-0.5 bg-[#27272a]/50 rounded-xl p-1 border border-white/5">
+        <div className="flex items-center gap-0.5 bg-[var(--surface-2)] rounded-xl p-1 border border-[var(--border)]">
           <ToggleButton
             onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
             isActive={editor.isActive("heading", { level: 1 })}
@@ -251,10 +251,10 @@ export default function EnhancedToolbar({ editor, onExport }: EnhancedToolbarPro
           </ToggleButton>
         </div>
 
-        <div className="w-px h-6 bg-white/10 mx-1" />
+        <div className="w-px h-6 bg-[var(--border)] mx-1" />
 
         {/* Lists Group */}
-        <div className="flex items-center gap-0.5 bg-[#27272a]/50 rounded-xl p-1 border border-white/5">
+        <div className="flex items-center gap-0.5 bg-[var(--surface-2)] rounded-xl p-1 border border-[var(--border)]">
           <ToggleButton
             onClick={() => editor.chain().focus().toggleBulletList().run()}
             isActive={editor.isActive("bulletList")}
@@ -271,10 +271,10 @@ export default function EnhancedToolbar({ editor, onExport }: EnhancedToolbarPro
           </ToggleButton>
         </div>
 
-        <div className="w-px h-6 bg-white/10 mx-1" />
+        <div className="w-px h-6 bg-[var(--border)] mx-1" />
 
         {/* Blocks Group */}
-        <div className="flex items-center gap-0.5 bg-[#27272a]/50 rounded-xl p-1 border border-white/5">
+        <div className="flex items-center gap-0.5 bg-[var(--surface-2)] rounded-xl p-1 border border-[var(--border)]">
           <ToggleButton
             onClick={() => editor.chain().focus().toggleBlockquote().run()}
             isActive={editor.isActive("blockquote")}
@@ -291,7 +291,7 @@ export default function EnhancedToolbar({ editor, onExport }: EnhancedToolbarPro
           </ToggleButton>
         </div>
 
-        <div className="w-px h-6 bg-white/10 mx-1" />
+        <div className="w-px h-6 bg-[var(--border)] mx-1" />
 
         {/* Media & Actions */}
         <div className="flex items-center gap-0.5">
@@ -316,7 +316,7 @@ export default function EnhancedToolbar({ editor, onExport }: EnhancedToolbarPro
             <Smile size={16} strokeWidth={2.5} />
           </ToggleButton>
 
-          <div className="w-px h-6 bg-white/10 mx-1" />
+          <div className="w-px h-6 bg-[var(--border)] mx-1" />
 
           <div className="relative">
             <ToggleButton
@@ -332,7 +332,7 @@ export default function EnhancedToolbar({ editor, onExport }: EnhancedToolbarPro
                     onExport?.('pdf');
                     setShowExport(false);
                   }}
-                  className="px-3 py-2 text-left text-sm rounded hover:bg-[#27272a] text-gray-300"
+                  className="px-3 py-2 text-left text-sm rounded hover:bg-[var(--surface-2)] text-[var(--muted-strong)]"
                 >
                   Export as PDF
                 </button>
@@ -341,7 +341,7 @@ export default function EnhancedToolbar({ editor, onExport }: EnhancedToolbarPro
                     onExport?.('docx');
                     setShowExport(false);
                   }}
-                  className="px-3 py-2 text-left text-sm rounded hover:bg-[#27272a] text-gray-300"
+                  className="px-3 py-2 text-left text-sm rounded hover:bg-[var(--surface-2)] text-[var(--muted-strong)]"
                 >
                   Export as DOCX
                 </button>
@@ -350,7 +350,7 @@ export default function EnhancedToolbar({ editor, onExport }: EnhancedToolbarPro
                     onExport?.('txt');
                     setShowExport(false);
                   }}
-                  className="px-3 py-2 text-left text-sm rounded hover:bg-[#27272a] text-gray-300"
+                  className="px-3 py-2 text-left text-sm rounded hover:bg-[var(--surface-2)] text-[var(--muted-strong)]"
                 >
                   Export as TXT
                 </button>
@@ -403,7 +403,7 @@ const ToggleButton = ({
     className={`p-2 rounded-lg transition-all duration-200 ${
       isActive
         ? "bg-[#f472b6] text-white shadow-[0_0_10px_rgba(244,114,182,0.4)]"
-        : "text-[#a1a1aa] hover:bg-white/10 hover:text-white"
+        : "text-[var(--muted)] hover:bg-[var(--border)] hover:text-[var(--foreground)]"
     } ${
       disabled ? "opacity-30 cursor-not-allowed" : "hover:scale-105 active:scale-95"
     }`}
@@ -426,7 +426,7 @@ const Dropdown = ({
   return (
     <>
       <div className="fixed inset-0 z-10" onClick={onClose} />
-      <div className="absolute top-full mt-2 z-20 bg-[#0a0a0a] rounded-xl shadow-2xl border border-[#27272a] p-3 min-w-[180px]">
+      <div className="absolute top-full mt-2 z-20 bg-[var(--surface)] rounded-xl shadow-2xl border border-[var(--border)] p-3 min-w-[180px]">
         {children}
       </div>
     </>

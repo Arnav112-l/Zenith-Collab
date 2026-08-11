@@ -238,19 +238,19 @@ export default function ExpenseEditor({ content, onChange, readOnly }: ExpenseEd
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white p-6">
+    <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-3xl font-bold text-white mb-2">Expense Tracker</h2>
+            <h2 className="text-3xl font-bold text-[var(--foreground)] mb-2">Expense Tracker</h2>
             <p className="text-[#a1a1aa]">Track and categorize your expenses</p>
           </div>
           <select
             value={currency}
             onChange={(e) => handleCurrencyChange(e.target.value)}
             disabled={readOnly}
-            className="bg-[#18181b] text-white px-4 py-2 rounded-lg border border-[#27272a] focus:outline-none focus:border-[#f472b6]"
+            className="bg-[var(--surface-2)] text-[var(--foreground)] px-4 py-2 rounded-lg border border-[var(--border)] focus:outline-none focus:border-[#f472b6]"
           >
             {CURRENCIES.map(curr => (
               <option key={curr.code} value={curr.code}>
@@ -262,35 +262,35 @@ export default function ExpenseEditor({ content, onChange, readOnly }: ExpenseEd
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-[#18181b] rounded-xl border border-[#27272a] p-6">
+          <div className="bg-[var(--surface-2)] rounded-xl border border-[var(--border)] p-6">
             <div className="flex items-center gap-2 mb-2">
               <DollarSign size={20} className="text-[#f472b6]" />
               <h3 className="text-[#a1a1aa] font-medium text-sm">Total Expenses</h3>
             </div>
-            <p className="text-3xl font-bold text-white">{currencySymbol}{totalExpenses.toLocaleString()}</p>
+            <p className="text-3xl font-bold text-[var(--foreground)]">{currencySymbol}{totalExpenses.toLocaleString()}</p>
           </div>
-          <div className="bg-[#18181b] rounded-xl border border-[#27272a] p-6">
+          <div className="bg-[var(--surface-2)] rounded-xl border border-[var(--border)] p-6">
             <div className="flex items-center gap-2 mb-2">
               <Tag size={20} className="text-[#60a5fa]" />
               <h3 className="text-[#a1a1aa] font-medium text-sm">Categories</h3>
             </div>
-            <p className="text-3xl font-bold text-white">{categories.length}</p>
+            <p className="text-3xl font-bold text-[var(--foreground)]">{categories.length}</p>
           </div>
-          <div className="bg-[#18181b] rounded-xl border border-[#27272a] p-6">
+          <div className="bg-[var(--surface-2)] rounded-xl border border-[var(--border)] p-6">
             <div className="flex items-center gap-2 mb-2">
               <TrendingUp size={20} className="text-[#34d399]" />
               <h3 className="text-[#a1a1aa] font-medium text-sm">Total Transactions</h3>
             </div>
-            <p className="text-3xl font-bold text-white">{expenses.length}</p>
+            <p className="text-3xl font-bold text-[var(--foreground)]">{expenses.length}</p>
           </div>
         </div>
 
         {/* Visualization */}
         {categoryData.length > 0 && (
-          <div className="bg-[#18181b] rounded-2xl border border-[#27272a] p-6">
+          <div className="bg-[var(--surface-2)] rounded-2xl border border-[var(--border)] p-6">
             <div className="flex items-center gap-2 mb-4">
               <PieChartIcon size={20} className="text-[#f472b6]" />
-              <h3 className="text-white font-semibold text-lg">Expense Distribution</h3>
+              <h3 className="text-[var(--foreground)] font-semibold text-lg">Expense Distribution</h3>
             </div>
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
@@ -315,10 +315,10 @@ export default function ExpenseEditor({ content, onChange, readOnly }: ExpenseEd
         )}
 
         {/* Categories Management */}
-        <div className="bg-[#18181b] rounded-2xl border border-[#27272a] p-6">
+        <div className="bg-[var(--surface-2)] rounded-2xl border border-[var(--border)] p-6">
           <div className="flex items-center gap-2 mb-6">
             <Tag size={20} className="text-[#f472b6]" />
-            <h3 className="text-white font-semibold text-lg">Expense Categories</h3>
+            <h3 className="text-[var(--foreground)] font-semibold text-lg">Expense Categories</h3>
           </div>
 
           <div className="space-y-4">
@@ -332,7 +332,7 @@ export default function ExpenseEditor({ content, onChange, readOnly }: ExpenseEd
                     <div className="flex items-center gap-3 flex-1">
                       <div className="w-3 h-8 rounded" style={{ backgroundColor: cat.color }} />
                       <div className="flex-1">
-                        <h4 className="text-white font-medium">{cat.name}</h4>
+                        <h4 className="text-[var(--foreground)] font-medium">{cat.name}</h4>
                         <p className="text-[#a1a1aa] text-sm">
                           Spent: {currencySymbol}{categoryTotal.toLocaleString()}
                           {cat.budget && ` / ${currencySymbol}${cat.budget.toLocaleString()}`}
@@ -351,7 +351,7 @@ export default function ExpenseEditor({ content, onChange, readOnly }: ExpenseEd
 
                   {cat.budget && (
                     <div className="mb-3">
-                      <div className="h-2 bg-[#18181b] rounded-full overflow-hidden">
+                      <div className="h-2 bg-[var(--surface-2)] rounded-full overflow-hidden">
                         <div
                           className="h-full transition-all"
                           style={{
@@ -370,7 +370,7 @@ export default function ExpenseEditor({ content, onChange, readOnly }: ExpenseEd
                         placeholder="Budget (optional)"
                         value={cat.budget || ''}
                         onChange={(e) => handleUpdateCategoryBudget(cat.id, parseFloat(e.target.value) || 0)}
-                        className="flex-1 bg-[#18181b] text-white text-sm rounded px-3 py-2 border border-[#3f3f46] focus:outline-none focus:border-[#f472b6]"
+                        className="flex-1 bg-[var(--surface-2)] text-[var(--foreground)] text-sm rounded px-3 py-2 border border-[#3f3f46] focus:outline-none focus:border-[#f472b6]"
                       />
                       <button
                         onClick={() => setEditingCategoryId(null)}
@@ -402,14 +402,14 @@ export default function ExpenseEditor({ content, onChange, readOnly }: ExpenseEd
                     placeholder="Category name (e.g., Travel)"
                     value={newCategoryName}
                     onChange={(e) => setNewCategoryName(e.target.value)}
-                    className="bg-[#18181b] text-white text-sm rounded px-3 py-2 border border-[#3f3f46] focus:outline-none focus:border-[#f472b6]"
+                    className="bg-[var(--surface-2)] text-[var(--foreground)] text-sm rounded px-3 py-2 border border-[#3f3f46] focus:outline-none focus:border-[#f472b6]"
                   />
                   <input
                     type="number"
                     placeholder="Budget (optional)"
                     value={newCategoryBudget}
                     onChange={(e) => setNewCategoryBudget(e.target.value)}
-                    className="bg-[#18181b] text-white text-sm rounded px-3 py-2 border border-[#3f3f46] focus:outline-none focus:border-[#f472b6]"
+                    className="bg-[var(--surface-2)] text-[var(--foreground)] text-sm rounded px-3 py-2 border border-[#3f3f46] focus:outline-none focus:border-[#f472b6]"
                   />
                 </div>
                 <button
@@ -425,17 +425,17 @@ export default function ExpenseEditor({ content, onChange, readOnly }: ExpenseEd
 
         {/* Add Expense */}
         {!readOnly && (
-          <div className="bg-[#18181b] rounded-2xl border border-[#27272a] p-6">
+          <div className="bg-[var(--surface-2)] rounded-2xl border border-[var(--border)] p-6">
             <div className="flex items-center gap-2 mb-4">
               <Plus size={20} className="text-[#f472b6]" />
-              <h3 className="text-white font-semibold text-lg">Add Expense</h3>
+              <h3 className="text-[var(--foreground)] font-semibold text-lg">Add Expense</h3>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <select
                 value={newExpenseCategory}
                 onChange={(e) => setNewExpenseCategory(e.target.value)}
-                className="bg-[#27272a] text-white rounded px-4 py-2 border border-[#3f3f46] focus:outline-none focus:border-[#f472b6]"
+                className="bg-[#27272a] text-[var(--foreground)] rounded px-4 py-2 border border-[#3f3f46] focus:outline-none focus:border-[#f472b6]"
               >
                 <option value="">Select Category</option>
                 {categories.map(cat => (
@@ -448,7 +448,7 @@ export default function ExpenseEditor({ content, onChange, readOnly }: ExpenseEd
                 placeholder="Amount"
                 value={newExpenseAmount}
                 onChange={(e) => setNewExpenseAmount(e.target.value)}
-                className="bg-[#27272a] text-white rounded px-4 py-2 border border-[#3f3f46] focus:outline-none focus:border-[#f472b6]"
+                className="bg-[#27272a] text-[var(--foreground)] rounded px-4 py-2 border border-[#3f3f46] focus:outline-none focus:border-[#f472b6]"
               />
 
               <input
@@ -456,14 +456,14 @@ export default function ExpenseEditor({ content, onChange, readOnly }: ExpenseEd
                 placeholder="Description (e.g., Lunch at restaurant)"
                 value={newExpenseDescription}
                 onChange={(e) => setNewExpenseDescription(e.target.value)}
-                className="bg-[#27272a] text-white rounded px-4 py-2 border border-[#3f3f46] focus:outline-none focus:border-[#f472b6]"
+                className="bg-[#27272a] text-[var(--foreground)] rounded px-4 py-2 border border-[#3f3f46] focus:outline-none focus:border-[#f472b6]"
               />
 
               <input
                 type="date"
                 value={newExpenseDate}
                 onChange={(e) => setNewExpenseDate(e.target.value)}
-                className="bg-[#27272a] text-white rounded px-4 py-2 border border-[#3f3f46] focus:outline-none focus:border-[#f472b6]"
+                className="bg-[#27272a] text-[var(--foreground)] rounded px-4 py-2 border border-[#3f3f46] focus:outline-none focus:border-[#f472b6]"
               />
 
               <input
@@ -471,7 +471,7 @@ export default function ExpenseEditor({ content, onChange, readOnly }: ExpenseEd
                 placeholder="Paid by (optional)"
                 value={newExpensePaidBy}
                 onChange={(e) => setNewExpensePaidBy(e.target.value)}
-                className="bg-[#27272a] text-white rounded px-4 py-2 border border-[#3f3f46] focus:outline-none focus:border-[#f472b6]"
+                className="bg-[#27272a] text-[var(--foreground)] rounded px-4 py-2 border border-[#3f3f46] focus:outline-none focus:border-[#f472b6]"
               />
 
               <button
@@ -485,10 +485,10 @@ export default function ExpenseEditor({ content, onChange, readOnly }: ExpenseEd
         )}
 
         {/* Expense List with Filters */}
-        <div className="bg-[#18181b] rounded-2xl border border-[#27272a] p-6">
+        <div className="bg-[var(--surface-2)] rounded-2xl border border-[var(--border)] p-6">
           <div className="flex items-center gap-2 mb-4">
             <Calendar size={20} className="text-[#f472b6]" />
-            <h3 className="text-white font-semibold text-lg">Expense History</h3>
+            <h3 className="text-[var(--foreground)] font-semibold text-lg">Expense History</h3>
           </div>
 
           {/* Filters */}
@@ -496,7 +496,7 @@ export default function ExpenseEditor({ content, onChange, readOnly }: ExpenseEd
             <select
               value={filterCategory}
               onChange={(e) => setFilterCategory(e.target.value)}
-              className="bg-[#18181b] text-white rounded px-4 py-2 border border-[#3f3f46] focus:outline-none focus:border-[#f472b6]"
+              className="bg-[var(--surface-2)] text-[var(--foreground)] rounded px-4 py-2 border border-[#3f3f46] focus:outline-none focus:border-[#f472b6]"
             >
               <option value="all">All Categories</option>
               {categories.map(cat => (
@@ -509,7 +509,7 @@ export default function ExpenseEditor({ content, onChange, readOnly }: ExpenseEd
               placeholder="From Date"
               value={filterDateFrom}
               onChange={(e) => setFilterDateFrom(e.target.value)}
-              className="bg-[#18181b] text-white rounded px-4 py-2 border border-[#3f3f46] focus:outline-none focus:border-[#f472b6]"
+              className="bg-[var(--surface-2)] text-[var(--foreground)] rounded px-4 py-2 border border-[#3f3f46] focus:outline-none focus:border-[#f472b6]"
             />
 
             <input
@@ -517,14 +517,14 @@ export default function ExpenseEditor({ content, onChange, readOnly }: ExpenseEd
               placeholder="To Date"
               value={filterDateTo}
               onChange={(e) => setFilterDateTo(e.target.value)}
-              className="bg-[#18181b] text-white rounded px-4 py-2 border border-[#3f3f46] focus:outline-none focus:border-[#f472b6]"
+              className="bg-[var(--surface-2)] text-[var(--foreground)] rounded px-4 py-2 border border-[#3f3f46] focus:outline-none focus:border-[#f472b6]"
             />
           </div>
 
           {/* Filtered Total */}
           <div className="mb-4 p-3 bg-[#27272a]/30 rounded-lg">
             <p className="text-[#a1a1aa] text-sm">
-              Showing {filteredExpenses.length} expense(s) - Total: <span className="text-white font-semibold">{currencySymbol}{filteredTotal.toLocaleString()}</span>
+              Showing {filteredExpenses.length} expense(s) - Total: <span className="text-[var(--foreground)] font-semibold">{currencySymbol}{filteredTotal.toLocaleString()}</span>
             </p>
           </div>
 
@@ -544,27 +544,27 @@ export default function ExpenseEditor({ content, onChange, readOnly }: ExpenseEd
                             type="number"
                             value={editAmount}
                             onChange={(e) => setEditAmount(e.target.value)}
-                            className="bg-[#18181b] text-white text-sm rounded px-3 py-2 border border-[#3f3f46] focus:outline-none focus:border-[#f472b6]"
+                            className="bg-[var(--surface-2)] text-[var(--foreground)] text-sm rounded px-3 py-2 border border-[#3f3f46] focus:outline-none focus:border-[#f472b6]"
                           />
                           <input
                             type="date"
                             value={editDate}
                             onChange={(e) => setEditDate(e.target.value)}
-                            className="bg-[#18181b] text-white text-sm rounded px-3 py-2 border border-[#3f3f46] focus:outline-none focus:border-[#f472b6]"
+                            className="bg-[var(--surface-2)] text-[var(--foreground)] text-sm rounded px-3 py-2 border border-[#3f3f46] focus:outline-none focus:border-[#f472b6]"
                           />
                         </div>
                         <input
                           type="text"
                           value={editDescription}
                           onChange={(e) => setEditDescription(e.target.value)}
-                          className="w-full bg-[#18181b] text-white text-sm rounded px-3 py-2 border border-[#3f3f46] focus:outline-none focus:border-[#f472b6]"
+                          className="w-full bg-[var(--surface-2)] text-[var(--foreground)] text-sm rounded px-3 py-2 border border-[#3f3f46] focus:outline-none focus:border-[#f472b6]"
                         />
                         <input
                           type="text"
                           placeholder="Paid by (optional)"
                           value={editPaidBy}
                           onChange={(e) => setEditPaidBy(e.target.value)}
-                          className="w-full bg-[#18181b] text-white text-sm rounded px-3 py-2 border border-[#3f3f46] focus:outline-none focus:border-[#f472b6]"
+                          className="w-full bg-[var(--surface-2)] text-[var(--foreground)] text-sm rounded px-3 py-2 border border-[#3f3f46] focus:outline-none focus:border-[#f472b6]"
                         />
                         <div className="flex gap-2">
                           <button
@@ -575,7 +575,7 @@ export default function ExpenseEditor({ content, onChange, readOnly }: ExpenseEd
                           </button>
                           <button
                             onClick={() => setEditingExpenseId(null)}
-                            className="bg-[#3f3f46] hover:bg-[#52525b] text-white px-3 py-2 rounded transition-colors"
+                            className="bg-[#3f3f46] hover:bg-[#52525b] text-[var(--foreground)] px-3 py-2 rounded transition-colors"
                           >
                             Cancel
                           </button>
@@ -587,7 +587,7 @@ export default function ExpenseEditor({ content, onChange, readOnly }: ExpenseEd
                           <div className="w-1 h-12 rounded" style={{ backgroundColor: getCategoryColor(exp.categoryId) }} />
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1">
-                              <span className="text-white font-medium">{exp.description}</span>
+                              <span className="text-[var(--foreground)] font-medium">{exp.description}</span>
                               <span className="text-xs bg-[#27272a] text-[#a1a1aa] px-2 py-1 rounded">
                                 {getCategoryName(exp.categoryId)}
                               </span>
@@ -599,7 +599,7 @@ export default function ExpenseEditor({ content, onChange, readOnly }: ExpenseEd
                           </div>
                         </div>
                         <div className="flex items-center gap-3">
-                          <span className="text-xl font-bold text-white">{currencySymbol}{exp.amount.toLocaleString()}</span>
+                          <span className="text-xl font-bold text-[var(--foreground)]">{currencySymbol}{exp.amount.toLocaleString()}</span>
                           {!readOnly && (
                             <div className="flex gap-2">
                               <button

@@ -17,43 +17,65 @@ interface Message {
 export default function AIAssistantEditor({ content, onChange, readOnly }: AIAssistantEditorProps) {
   const [messages, setMessages] = useState<Message[]>(() => {
     try {
-      return content ? JSON.parse(content) : []
+      const parsed = content ? JSON.parse(content) : []
+      return Array.isArray(parsed) ? parsed : []
     } catch {
       return []
     }
   })
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return
 
-    const newMessages = [
+    const newMessages: Message[] = [
       ...messages,
-      { role: 'user' as const, content: input }
+      { role: 'user', content: input.trim() },
     ]
     setMessages(newMessages)
     setInput('')
     setIsLoading(true)
+    setError(null)
 
-    // Simulate AI response
-    setTimeout(() => {
-      const assistantMessage = {
-        role: 'assistant' as const,
-        content: "I'm a simulated AI assistant. I can help you with your tasks, answer questions, or generate content. How can I assist you today?"
+    try {
+      const response = await fetch('/api/ai/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: newMessages }),
+      })
+      const data = await response.json()
+
+      if (!response.ok) {
+        const message =
+          data?.code === 'AI_NOT_CONFIGURED'
+            ? 'Add OPENAI_API_KEY in client/.env to enable AI chat.'
+            : data?.error || 'Failed to get AI response'
+        setError(message)
+        setMessages(newMessages)
+        onChange(JSON.stringify(newMessages))
+        return
       }
-      const updatedMessages = [...newMessages, assistantMessage]
+
+      const updatedMessages: Message[] = [
+        ...newMessages,
+        { role: 'assistant', content: data.content },
+      ]
       setMessages(updatedMessages)
       onChange(JSON.stringify(updatedMessages))
+    } catch {
+      setError('Network error talking to AI.')
+    } finally {
       setIsLoading(false)
-    }, 1000)
+    }
   }
 
   return (
-    <div className="flex flex-col h-full bg-[#0a0a0a] text-white">
+    <div className="flex flex-col h-full bg-[var(--surface)] text-[var(--foreground)]">
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-full text-zinc-500">
+          <div className="flex flex-col items-center justify-center h-full text-[var(--muted)]">
             <Bot className="w-12 h-12 mb-4 opacity-50" />
             <p>Start a conversation with the AI Assistant</p>
           </div>
@@ -73,7 +95,7 @@ export default function AIAssistantEditor({ content, onChange, readOnly }: AIAss
               {msg.role === 'user' ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
             </div>
             <div
-              className={`max-w-[80%] rounded-2xl px-4 py-2 ${
+              className={`max-w-[80%] rounded-2xl px-4 py-2 whitespace-pre-wrap ${
                 msg.role === 'user'
                   ? 'bg-blue-600/20 text-blue-100'
                   : 'bg-zinc-800 text-zinc-100'
@@ -95,10 +117,15 @@ export default function AIAssistantEditor({ content, onChange, readOnly }: AIAss
             </div>
           </div>
         )}
+        {error && (
+          <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+            {error}
+          </div>
+        )}
       </div>
 
       {!readOnly && (
-        <div className="p-4 border-t border-[#27272a] bg-[#0a0a0a]">
+        <div className="p-4 border-t border-[var(--border)] bg-[var(--surface)]">
           <div className="flex gap-2">
             <input
               type="text"
@@ -106,7 +133,7 @@ export default function AIAssistantEditor({ content, onChange, readOnly }: AIAss
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSend()}
               placeholder="Type a message..."
-              className="flex-1 bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all"
+              className="flex-1 bg-[var(--surface-2)] border border-zinc-800 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all"
             />
             <button
               onClick={handleSend}
@@ -121,6 +148,3 @@ export default function AIAssistantEditor({ content, onChange, readOnly }: AIAss
     </div>
   )
 }
-
-
-

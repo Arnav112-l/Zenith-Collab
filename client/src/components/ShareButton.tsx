@@ -1,12 +1,13 @@
-"use client";
+'use client'
 
-import { useState } from "react";
-import { Share2, Lock, Eye, Edit3, Link as LinkIcon, Check } from "lucide-react";
+import { useEffect, useRef, useState } from 'react'
+import { Share2, Lock, Eye, Edit3, Link as LinkIcon, Check } from 'lucide-react'
+import { AnimatePresence, motion } from 'framer-motion'
 
 interface ShareButtonProps {
-  documentId: string;
-  initialAccess: string;
-  isOwner: boolean;
+  documentId: string
+  initialAccess: string
+  isOwner: boolean
 }
 
 export default function ShareButton({
@@ -14,89 +15,118 @@ export default function ShareButton({
   initialAccess,
   isOwner,
 }: ShareButtonProps) {
-  const [access, setAccess] = useState(initialAccess);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [access, setAccess] = useState(initialAccess)
+  const [isLoading, setIsLoading] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
+  const [copied, setCopied] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const onDown = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setIsOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', onDown)
+    return () => document.removeEventListener('mousedown', onDown)
+  }, [])
 
   const updateAccess = async (newAccess: string) => {
-    setIsLoading(true);
+    setIsLoading(true)
     try {
       const res = await fetch(`/api/documents/${documentId}/share`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ publicAccess: newAccess }),
-      });
+      })
 
       if (res.ok) {
-        setAccess(newAccess);
-        setIsOpen(false);
-        // Reload page to get new JWT with updated permissions
-        window.location.reload();
+        setAccess(newAccess)
+        setIsOpen(false)
+        window.location.reload()
       }
     } catch (error) {
-      console.error("Failed to update access:", error);
+      console.error('Failed to update access:', error)
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   const copyLink = async () => {
-    const url = `${window.location.origin}/documents/${documentId}`;
-    await navigator.clipboard.writeText(url);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
+    const url = `${window.location.origin}/documents/${documentId}`
+    await navigator.clipboard.writeText(url)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
 
   const getAccessIcon = () => {
     switch (access) {
-      case "PRIVATE":
-        return <Lock className="h-4 w-4" />;
-      case "READ":
-        return <Eye className="h-4 w-4" />;
-      case "WRITE":
-        return <Edit3 className="h-4 w-4" />;
+      case 'PRIVATE':
+        return <Lock className="h-4 w-4" />
+      case 'READ':
+        return <Eye className="h-4 w-4" />
+      case 'WRITE':
+        return <Edit3 className="h-4 w-4" />
       default:
-        return <Share2 className="h-4 w-4" />;
+        return <Share2 className="h-4 w-4" />
     }
-  };
+  }
 
   const getAccessLabel = () => {
     switch (access) {
-      case "PRIVATE":
-        return "Private";
-      case "READ":
-        return "View Only";
-      case "WRITE":
-        return "Can Edit";
+      case 'PRIVATE':
+        return 'Private'
+      case 'READ':
+        return 'View Only'
+      case 'WRITE':
+        return 'Can Edit'
       default:
-        return "Share";
+        return 'Share'
     }
-  };
+  }
 
-  if (!isOwner && access === "PRIVATE") return null;
+  if (!isOwner && access === 'PRIVATE') return null
+
+  const options = [
+    {
+      id: 'PRIVATE',
+      label: 'Private',
+      desc: 'Only you can access',
+      icon: Lock,
+    },
+    {
+      id: 'READ',
+      label: 'View Only',
+      desc: 'Anyone with the link can view',
+      icon: Eye,
+    },
+    {
+      id: 'WRITE',
+      label: 'Can Edit',
+      desc: 'Anyone with the link can edit',
+      icon: Edit3,
+    },
+  ] as const
 
   return (
-    <div className="relative">
+    <div className="relative" ref={menuRef}>
       <div className="flex items-center gap-2">
         {isOwner && (
           <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-[#0F1419] border border-gray-800 rounded-xl hover:bg-[#1A1F2E] transition-all shadow-sm"
+            type="button"
+            onClick={() => setIsOpen((v) => !v)}
+            className="ui-btn"
           >
             {getAccessIcon()}
             <span className="hidden sm:inline">{getAccessLabel()}</span>
           </button>
         )}
-        
-        <button
-          onClick={copyLink}
-          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-violet-500 to-purple-600 rounded-xl hover:from-violet-600 hover:to-purple-700 transition-all shadow-lg"
-        >
+
+        <button type="button" onClick={copyLink} className="ui-btn-primary">
           {copied ? (
             <>
               <Check className="h-4 w-4" />
-              <span className="hidden sm:inline">Copied!</span>
+              <span className="hidden sm:inline">Copied</span>
             </>
           ) : (
             <>
@@ -107,86 +137,38 @@ export default function ShareButton({
         </button>
       </div>
 
-      {isOpen && isOwner && (
-        <>
-          <div
-            className="fixed inset-0 z-50"
-            onClick={() => setIsOpen(false)}
-          />
-          <div className="absolute right-0 mt-2 w-64 z-50 bg-[#1A1F2E] rounded-xl shadow-2xl border border-gray-800 backdrop-blur-none">
-            <div className="p-2">
+      <AnimatePresence>
+        {isOpen && isOwner && (
+          <motion.div
+            initial={{ opacity: 0, y: 8, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 8, scale: 0.98 }}
+            transition={{ duration: 0.16 }}
+            className="ui-popover absolute right-0 mt-2 w-72 z-50 p-2"
+          >
+            <p className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wider ui-muted">
+              Sharing
+            </p>
+            {options.map(({ id, label, desc, icon: Icon }) => (
               <button
-                onClick={() => updateAccess("PRIVATE")}
+                key={id}
+                type="button"
                 disabled={isLoading}
-                className={`w-full flex items-start gap-3 px-3 py-2.5 rounded-lg text-left transition-colors ${
-                  access === "PRIVATE"
-                    ? "bg-violet-500/20 border border-violet-500/50"
-                    : "hover:bg-[#0F1419] border border-transparent"
-                } disabled:opacity-50`}
+                data-active={access === id}
+                onClick={() => updateAccess(id)}
+                className="ui-menu-item disabled:opacity-50"
               >
-                <Lock className="h-5 w-5 mt-0.5 text-gray-400" />
+                <Icon className="h-5 w-5 mt-0.5 ui-muted" />
                 <div className="flex-1 min-w-0">
-                  <div className="font-medium text-white">
-                    Private
-                  </div>
-                  <div className="text-xs text-gray-400 mt-0.5">
-                    Only you can access
-                  </div>
+                  <div className="font-medium text-sm">{label}</div>
+                  <div className="text-xs ui-muted mt-0.5">{desc}</div>
                 </div>
-                {access === "PRIVATE" && (
-                  <Check className="h-5 w-5 text-violet-400" />
-                )}
+                {access === id && <Check className="h-4 w-4 text-[var(--accent)]" />}
               </button>
-              
-              <button
-                onClick={() => updateAccess("READ")}
-                disabled={isLoading}
-                className={`w-full flex items-start gap-3 px-3 py-2.5 rounded-lg text-left transition-colors ${
-                  access === "READ"
-                    ? "bg-violet-500/20 border border-violet-500/50"
-                    : "hover:bg-[#0F1419] border border-transparent"
-                } disabled:opacity-50`}
-              >
-                <Eye className="h-5 w-5 mt-0.5 text-gray-400" />
-                <div className="flex-1 min-w-0">
-                  <div className="font-medium text-white">
-                    View Only
-                  </div>
-                  <div className="text-xs text-gray-400 mt-0.5">
-                    Anyone with link can view
-                  </div>
-                </div>
-                {access === "READ" && (
-                  <Check className="h-5 w-5 text-violet-400" />
-                )}
-              </button>
-              
-              <button
-                onClick={() => updateAccess("WRITE")}
-                disabled={isLoading}
-                className={`w-full flex items-start gap-3 px-3 py-2.5 rounded-lg text-left transition-colors ${
-                  access === "WRITE"
-                    ? "bg-violet-500/20 border border-violet-500/50"
-                    : "hover:bg-[#0F1419] border border-transparent"
-                } disabled:opacity-50`}
-              >
-                <Edit3 className="h-5 w-5 mt-0.5 text-gray-400" />
-                <div className="flex-1 min-w-0">
-                  <div className="font-medium text-white">
-                    Can Edit
-                  </div>
-                  <div className="text-xs text-gray-400 mt-0.5">
-                    Anyone with link can edit
-                  </div>
-                </div>
-                {access === "WRITE" && (
-                  <Check className="h-5 w-5 text-violet-400" />
-                )}
-              </button>
-            </div>
-          </div>
-        </>
-      )}
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
-  );
+  )
 }

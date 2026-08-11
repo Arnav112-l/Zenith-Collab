@@ -107,11 +107,18 @@ export default function FileManagerEditor({ content, onChange, readOnly }: FileM
   const handleFileUpload = async (fileList: FileList | null) => {
     if (!fileList || fileList.length === 0) return
 
+    const MAX_FILE_BYTES = 512 * 1024 // 512KB — keep Mongo payloads small
     const newFiles: FileItem[] = []
+    const rejected: string[] = []
 
     for (let i = 0; i < fileList.length; i++) {
       const file = fileList[i]
-      
+
+      if (file.size > MAX_FILE_BYTES) {
+        rejected.push(`${file.name} (${formatSize(file.size)})`)
+        continue
+      }
+
       const base64 = await new Promise<string>((resolve) => {
         const reader = new FileReader()
         reader.onloadend = () => resolve(reader.result as string)
@@ -130,7 +137,13 @@ export default function FileManagerEditor({ content, onChange, readOnly }: FileM
       })
     }
 
-    updateFiles([...files, ...newFiles])
+    if (rejected.length > 0) {
+      alert(`Skipped files over 512KB:\n${rejected.join('\n')}`)
+    }
+
+    if (newFiles.length > 0) {
+      updateFiles([...files, ...newFiles])
+    }
   }
 
   const formatSize = (bytes: number) => {
@@ -208,7 +221,7 @@ export default function FileManagerEditor({ content, onChange, readOnly }: FileM
 
   return (
     <div 
-      className="h-full bg-[#0a0a0a] text-white flex flex-col relative overflow-hidden"
+      className="h-full bg-[var(--background)] text-[var(--foreground)] flex flex-col relative overflow-hidden"
       onDragOver={(e) => { e.preventDefault(); setIsDragging(true) }}
       onDragLeave={() => setIsDragging(false)}
       onDrop={(e) => {
@@ -232,9 +245,9 @@ export default function FileManagerEditor({ content, onChange, readOnly }: FileM
       />
 
       {/* Toolbar */}
-      <div className="relative z-10 flex items-center justify-between p-6 gap-4 border-b border-[#27272a] bg-[#0a0a0a]/50 backdrop-blur-xl">
-        <div className="flex items-center gap-2 flex-1 max-w-md bg-[#18181b] rounded-xl px-4 py-2.5 border border-[#27272a] shadow-inner focus-within:border-[#f472b6]/50 transition-colors">
-          <Search className="w-4 h-4 text-zinc-500" />
+      <div className="relative z-10 flex items-center justify-between p-6 gap-4 border-b border-[var(--border)] bg-[var(--background)]/50 backdrop-blur-xl">
+        <div className="flex items-center gap-2 flex-1 max-w-md bg-[var(--surface-2)] rounded-xl px-4 py-2.5 border border-[var(--border)] shadow-inner focus-within:border-[#f472b6]/50 transition-colors">
+          <Search className="w-4 h-4 text-[var(--muted)]" />
           <input
             type="text"
             value={search}
@@ -245,16 +258,16 @@ export default function FileManagerEditor({ content, onChange, readOnly }: FileM
         </div>
         
         <div className="flex items-center gap-2">
-          <div className="flex bg-[#18181b] rounded-lg p-1 border border-[#27272a]">
+          <div className="flex bg-[var(--surface-2)] rounded-lg p-1 border border-[var(--border)]">
             <button
               onClick={() => setViewMode('grid')}
-              className={`p-2 rounded-md transition-all ${viewMode === 'grid' ? 'bg-[#27272a] text-[#f472b6] shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
+              className={`p-2 rounded-md transition-all ${viewMode === 'grid' ? 'bg-[#27272a] text-[#f472b6] shadow-sm' : 'text-[var(--muted)] hover:text-zinc-300'}`}
             >
               <Grid size={18} />
             </button>
             <button
               onClick={() => setViewMode('list')}
-              className={`p-2 rounded-md transition-all ${viewMode === 'list' ? 'bg-[#27272a] text-[#f472b6] shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
+              className={`p-2 rounded-md transition-all ${viewMode === 'list' ? 'bg-[#27272a] text-[#f472b6] shadow-sm' : 'text-[var(--muted)] hover:text-zinc-300'}`}
             >
               <List size={18} />
             </button>
@@ -265,7 +278,7 @@ export default function FileManagerEditor({ content, onChange, readOnly }: FileM
               <div className="h-8 w-px bg-[#27272a] mx-2" />
               <button
                 onClick={addFolder}
-                className="flex items-center gap-2 px-4 py-2.5 bg-[#27272a] hover:bg-[#3f3f46] text-white rounded-xl transition-all border border-[#3f3f46] hover:border-[#52525b] shadow-lg shadow-black/20"
+                className="flex items-center gap-2 px-4 py-2.5 bg-[#27272a] hover:bg-[#3f3f46] text-[var(--foreground)] rounded-xl transition-all border border-[#3f3f46] hover:border-[#52525b] shadow-lg shadow-black/20"
               >
                 <FolderPlus size={18} className="text-[#f472b6]" />
                 <span className="text-sm font-medium">New Folder</span>
@@ -283,7 +296,7 @@ export default function FileManagerEditor({ content, onChange, readOnly }: FileM
       </div>
 
       {/* Breadcrumbs */}
-      <div className="relative z-10 px-6 py-3 flex items-center gap-2 text-sm border-b border-[#27272a] bg-[#0a0a0a]/30 backdrop-blur-sm overflow-x-auto">
+      <div className="relative z-10 px-6 py-3 flex items-center gap-2 text-sm border-b border-[var(--border)] bg-[var(--background)]/30 backdrop-blur-sm overflow-x-auto">
         {getBreadcrumbs().map((crumb, index, arr) => (
           <div key={crumb.id || 'home'} className="flex items-center gap-2 flex-shrink-0">
             {index > 0 && <ChevronRight size={14} className="text-zinc-600" />}
@@ -291,8 +304,8 @@ export default function FileManagerEditor({ content, onChange, readOnly }: FileM
               onClick={() => setCurrentFolderId(crumb.id)}
               className={`flex items-center gap-2 px-2 py-1 rounded-lg transition-colors ${
                 index === arr.length - 1 
-                  ? 'text-white font-medium bg-[#27272a]' 
-                  : 'text-zinc-500 hover:text-zinc-300 hover:bg-[#27272a]/50'
+                  ? 'text-[var(--foreground)] font-medium bg-[#27272a]' 
+                  : 'text-[var(--muted)] hover:text-zinc-300 hover:bg-[var(--surface-2)]/50'
               }`}
             >
               {index === 0 && <CornerDownLeft size={14} />}
@@ -305,11 +318,11 @@ export default function FileManagerEditor({ content, onChange, readOnly }: FileM
       {/* Content Area */}
       <div className="flex-1 overflow-y-auto p-6 relative z-10" ref={containerRef}>
         {currentFiles.length === 0 ? (
-          <div className="h-full flex flex-col items-center justify-center text-zinc-500">
-            <div className="w-24 h-24 rounded-3xl bg-[#18181b] border border-[#27272a] flex items-center justify-center mb-4 shadow-[0_0_30px_rgba(0,0,0,0.5)]">
+          <div className="h-full flex flex-col items-center justify-center text-[var(--muted)]">
+            <div className="w-24 h-24 rounded-3xl bg-[var(--surface-2)] border border-[var(--border)] flex items-center justify-center mb-4 shadow-[0_0_30px_rgba(0,0,0,0.5)]">
               <Folder size={48} className="opacity-20" />
             </div>
-            <p className="text-lg font-medium text-zinc-400">This folder is empty</p>
+            <p className="text-lg font-medium text-[var(--muted)]">This folder is empty</p>
             <p className="text-sm mt-2">Drag and drop files here to upload</p>
           </div>
         ) : viewMode === 'grid' ? (
@@ -325,7 +338,7 @@ export default function FileManagerEditor({ content, onChange, readOnly }: FileM
                   className={`group relative aspect-[4/5] rounded-2xl p-4 flex flex-col items-center gap-3 transition-all duration-300 border ${
                     selectedId === file.id 
                       ? 'bg-[#27272a] border-[#f472b6] shadow-[0_0_20px_rgba(244,114,182,0.15)]' 
-                      : 'bg-[#18181b]/50 border-[#27272a] hover:bg-[#27272a] hover:border-[#3f3f46] hover:shadow-xl hover:-translate-y-1'
+                      : 'bg-[var(--surface-2)]/50 border-[var(--border)] hover:bg-[var(--surface-2)] hover:border-[#3f3f46] hover:shadow-xl hover:-translate-y-1'
                   }`}
                   onClick={() => setSelectedId(file.id)}
                   onDoubleClick={() => file.type === 'folder' && setCurrentFolderId(file.id)}
@@ -334,7 +347,7 @@ export default function FileManagerEditor({ content, onChange, readOnly }: FileM
                     setContextMenu({ x: e.clientX, y: e.clientY, fileId: file.id })
                   }}
                 >
-                  <div className="flex-1 w-full flex items-center justify-center relative overflow-hidden rounded-xl bg-[#0a0a0a]/50 p-4">
+                  <div className="flex-1 w-full flex items-center justify-center relative overflow-hidden rounded-xl bg-[var(--background)]/50 p-4">
                     {file.type === 'file' && file.mimeType?.startsWith('image/') && file.content ? (
                       <img src={file.content} alt={file.name} className="w-full h-full object-cover rounded-lg opacity-80 group-hover:opacity-100 transition-opacity" />
                     ) : (
@@ -344,19 +357,19 @@ export default function FileManagerEditor({ content, onChange, readOnly }: FileM
                     )}
                   </div>
                   <div className="w-full text-center">
-                    <p className="text-sm font-medium truncate w-full text-zinc-200 group-hover:text-white transition-colors">
+                    <p className="text-sm font-medium truncate w-full text-zinc-200 group-hover:text-[var(--foreground)] transition-colors">
                       {file.name}
                     </p>
-                    <p className="text-xs text-zinc-500 mt-1">{file.size}</p>
+                    <p className="text-xs text-[var(--muted)] mt-1">{file.size}</p>
                   </div>
                 </motion.div>
               ))}
             </AnimatePresence>
           </div>
         ) : (
-          <div className="bg-[#18181b]/50 border border-[#27272a] rounded-2xl overflow-hidden backdrop-blur-sm">
+          <div className="bg-[var(--surface-2)]/50 border border-[var(--border)] rounded-2xl overflow-hidden backdrop-blur-sm">
             <table className="w-full text-left text-sm">
-              <thead className="bg-[#27272a]/50 text-zinc-400 font-medium uppercase text-xs tracking-wider">
+              <thead className="bg-[#27272a]/50 text-[var(--muted)] font-medium uppercase text-xs tracking-wider">
                 <tr>
                   <th className="px-6 py-4">Name</th>
                   <th className="px-6 py-4">Size</th>
@@ -368,7 +381,7 @@ export default function FileManagerEditor({ content, onChange, readOnly }: FileM
                 {currentFiles.map((file) => (
                   <tr 
                     key={file.id}
-                    className="hover:bg-[#27272a]/50 transition-colors group cursor-pointer"
+                    className="hover:bg-[var(--surface-2)]/50 transition-colors group cursor-pointer"
                     onClick={() => setSelectedId(file.id)}
                     onDoubleClick={() => file.type === 'folder' && setCurrentFolderId(file.id)}
                     onContextMenu={(e) => {
@@ -378,29 +391,29 @@ export default function FileManagerEditor({ content, onChange, readOnly }: FileM
                   >
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 p-1.5 rounded-lg bg-[#0a0a0a] border border-[#27272a]">
+                        <div className="w-8 h-8 p-1.5 rounded-lg bg-[var(--background)] border border-[var(--border)]">
                           {getFileIcon(file)}
                         </div>
-                        <span className="text-zinc-200 group-hover:text-white transition-colors font-medium">
+                        <span className="text-zinc-200 group-hover:text-[var(--foreground)] transition-colors font-medium">
                           {file.name}
                         </span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-zinc-500">{file.size}</td>
-                    <td className="px-6 py-4 text-zinc-500">{file.date}</td>
+                    <td className="px-6 py-4 text-[var(--muted)]">{file.size}</td>
+                    <td className="px-6 py-4 text-[var(--muted)]">{file.date}</td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         {file.type === 'file' && (
                           <button 
                             onClick={(e) => { e.stopPropagation(); /* download logic */ }}
-                            className="p-2 hover:bg-[#3f3f46] rounded-lg text-zinc-400 hover:text-white transition-colors"
+                            className="p-2 hover:bg-[#3f3f46] rounded-lg text-[var(--muted)] hover:text-[var(--foreground)] transition-colors"
                           >
                             <Download size={16} />
                           </button>
                         )}
                         <button 
                           onClick={(e) => { e.stopPropagation(); setDeleteConfirm(file.id) }}
-                          className="p-2 hover:bg-red-500/10 rounded-lg text-zinc-400 hover:text-red-400 transition-colors"
+                          className="p-2 hover:bg-red-500/10 rounded-lg text-[var(--muted)] hover:text-red-400 transition-colors"
                         >
                           <Trash2 size={16} />
                         </button>
@@ -423,9 +436,9 @@ export default function FileManagerEditor({ content, onChange, readOnly }: FileM
             exit={{ opacity: 0 }}
             className="absolute inset-0 z-50 bg-[#f472b6]/10 backdrop-blur-sm border-4 border-[#f472b6] border-dashed m-4 rounded-3xl flex items-center justify-center pointer-events-none"
           >
-            <div className="bg-[#0a0a0a] p-8 rounded-3xl border border-[#f472b6] shadow-[0_0_50px_rgba(244,114,182,0.3)] flex flex-col items-center gap-4">
+            <div className="bg-[var(--background)] p-8 rounded-3xl border border-[#f472b6] shadow-[0_0_50px_rgba(244,114,182,0.3)] flex flex-col items-center gap-4">
               <Upload size={48} className="text-[#f472b6] animate-bounce" />
-              <p className="text-xl font-bold text-white">Drop files to upload</p>
+              <p className="text-xl font-bold text-[var(--foreground)]">Drop files to upload</p>
             </div>
           </motion.div>
         )}
@@ -434,12 +447,12 @@ export default function FileManagerEditor({ content, onChange, readOnly }: FileM
       {/* Context Menu */}
       {contextMenu && (
         <div 
-          className="fixed z-[100] bg-[#18181b] border border-[#27272a] rounded-xl shadow-2xl py-2 min-w-[160px] overflow-hidden"
+          className="fixed z-[100] bg-[var(--surface-2)] border border-[var(--border)] rounded-xl shadow-2xl py-2 min-w-[160px] overflow-hidden"
           style={{ top: contextMenu.y, left: contextMenu.x }}
           onClick={(e) => e.stopPropagation()}
         >
           <button 
-            className="w-full px-4 py-2 text-left text-sm text-zinc-300 hover:bg-[#27272a] hover:text-white transition-colors flex items-center gap-2"
+            className="w-full px-4 py-2 text-left text-sm text-zinc-300 hover:bg-[var(--surface-2)] hover:text-[var(--foreground)] transition-colors flex items-center gap-2"
             onClick={() => {
               // Rename logic
               setContextMenu(null)
@@ -484,9 +497,9 @@ export default function FileManagerEditor({ content, onChange, readOnly }: FileM
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-sm bg-[#18181b] border border-[#27272a] rounded-xl shadow-2xl p-6 overflow-hidden"
+              className="relative w-full max-w-sm bg-[var(--surface-2)] border border-[var(--border)] rounded-xl shadow-2xl p-6 overflow-hidden"
             >
-              <h3 className="text-lg font-bold text-white mb-4">New Folder</h3>
+              <h3 className="text-lg font-bold text-[var(--foreground)] mb-4">New Folder</h3>
               <input
                 autoFocus
                 type="text"
@@ -497,19 +510,19 @@ export default function FileManagerEditor({ content, onChange, readOnly }: FileM
                   if (e.key === 'Escape') setShowFolderInput(false)
                 }}
                 placeholder="Folder Name"
-                className="w-full bg-[#0a0a0a] border border-[#27272a] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#f472b6] transition-colors mb-4"
+                className="w-full bg-[var(--background)] border border-[var(--border)] rounded-lg px-4 py-2 text-[var(--foreground)] focus:outline-none focus:border-[#f472b6] transition-colors mb-4"
               />
               <div className="flex justify-end gap-2">
                 <button
                   onClick={() => setShowFolderInput(false)}
-                  className="px-4 py-2 text-sm font-medium text-zinc-400 hover:text-white transition-colors"
+                  className="px-4 py-2 text-sm font-medium text-[var(--muted)] hover:text-[var(--foreground)] transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleCreateFolder}
                   disabled={!newFolderName.trim()}
-                  className="px-4 py-2 text-sm font-medium text-white bg-[#f472b6] hover:bg-[#ec4899] rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 text-sm font-medium text-[var(--foreground)] bg-[#f472b6] hover:bg-[#ec4899] rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Create
                 </button>

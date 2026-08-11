@@ -1,7 +1,13 @@
 import nodemailer from 'nodemailer';
 
-// Create email transporter
-// You'll need to configure this with your email service
+const escapeHtml = (value: string) =>
+  value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+
 export const createTransporter = () => {
   const emailUser = process.env.EMAIL_USER;
   const emailPass = process.env.EMAIL_PASS;
@@ -33,6 +39,9 @@ export const sendEventReminderEmail = async (
     return false;
   }
 
+  const safeTitle = escapeHtml(eventTitle || 'Untitled event');
+  const plainTitle = (eventTitle || 'Untitled event').replace(/[\r\n]+/g, ' ').slice(0, 200);
+
   const formattedStart = new Date(eventStart).toLocaleString('en-US', {
     weekday: 'long',
     year: 'numeric',
@@ -50,21 +59,21 @@ export const sendEventReminderEmail = async (
   const mailOptions = {
     from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
     to,
-    subject: `📅 Reminder: ${eventTitle}`,
+    subject: `Reminder: ${plainTitle}`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f4f5f7;">
         <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 10px 10px 0 0;">
-          <h1 style="color: white; margin: 0; font-size: 28px;">📅 Event Reminder</h1>
+          <h1 style="color: white; margin: 0; font-size: 28px;">Event Reminder</h1>
         </div>
         <div style="background-color: white; padding: 30px; border-radius: 0 0 10px 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-          <h2 style="color: #333; margin-top: 0;">${eventTitle}</h2>
+          <h2 style="color: #333; margin-top: 0;">${safeTitle}</h2>
           <div style="background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0;">
             <p style="margin: 5px 0; color: #666;">
-              <strong style="color: #333;">🕐 Start:</strong> ${formattedStart}
+              <strong style="color: #333;">Start:</strong> ${formattedStart}
             </p>
             ${formattedEnd ? `
             <p style="margin: 5px 0; color: #666;">
-              <strong style="color: #333;">🕐 End:</strong> ${formattedEnd}
+              <strong style="color: #333;">End:</strong> ${formattedEnd}
             </p>
             ` : ''}
           </div>
@@ -83,7 +92,7 @@ export const sendEventReminderEmail = async (
 
   try {
     await transporter.sendMail(mailOptions);
-    console.log(`Email sent to ${to} for event: ${eventTitle}`);
+    console.log(`Email sent to ${to} for event: ${plainTitle}`);
     return true;
   } catch (error) {
     console.error('Error sending email:', error);

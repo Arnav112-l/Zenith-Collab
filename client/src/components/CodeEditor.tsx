@@ -80,7 +80,7 @@ export default function CodeEditor({ content, onChange, readOnly, syncStatus = '
           <select
             value={language}
             onChange={(e) => handleLanguageChange(e.target.value)}
-            className="bg-[#3e3e3e] text-white text-sm rounded px-2 py-1 border border-[#52525b] focus:outline-none focus:border-[#f472b6]"
+            className="bg-[#3e3e3e] text-[var(--foreground)] text-sm rounded px-2 py-1 border border-[#52525b] focus:outline-none focus:border-[#f472b6]"
           >
             <option value="javascript">JavaScript</option>
             <option value="typescript">TypeScript</option>
@@ -165,7 +165,7 @@ export default function CodeEditor({ content, onChange, readOnly, syncStatus = '
           className="flex items-center justify-between px-4 py-2 bg-[#252526] cursor-pointer hover:bg-[#2a2a2b]"
           onClick={() => setIsTerminalOpen(!isTerminalOpen)}
         >
-          <div className="flex items-center gap-2 text-zinc-400">
+          <div className="flex items-center gap-2 text-[var(--muted)]">
             <Terminal size={14} />
             <span className="text-xs font-medium uppercase tracking-wider">Terminal</span>
           </div>
@@ -173,13 +173,13 @@ export default function CodeEditor({ content, onChange, readOnly, syncStatus = '
             {(output || input) && (
               <button 
                 onClick={(e) => { e.stopPropagation(); setOutput(null); setInput(""); }}
-                className="p-1 hover:bg-[#3e3e3e] rounded text-zinc-500 hover:text-zinc-300"
+                className="p-1 hover:bg-[#3e3e3e] rounded text-[var(--muted)] hover:text-zinc-300"
                 title="Clear Console"
               >
                 <Trash2 size={12} />
               </button>
             )}
-            {isTerminalOpen ? <ChevronDown size={14} className="text-zinc-500" /> : <ChevronUp size={14} className="text-zinc-500" />}
+            {isTerminalOpen ? <ChevronDown size={14} className="text-[var(--muted)]" /> : <ChevronUp size={14} className="text-[var(--muted)]" />}
           </div>
         </div>
 
@@ -189,11 +189,11 @@ export default function CodeEditor({ content, onChange, readOnly, syncStatus = '
             {/* Input Section */}
             <div className="w-1/2 flex flex-col border-r border-[#3e3e3e]">
               <div className="flex items-center justify-between px-3 py-1.5 bg-[#2d2d2d] border-b border-[#3e3e3e]">
-                <span className="text-xs font-medium text-zinc-500 uppercase tracking-wider">Input (stdin)</span>
+                <span className="text-xs font-medium text-[var(--muted)] uppercase tracking-wider">Input (stdin)</span>
                 {input && (
                   <button 
                     onClick={() => setInput("")}
-                    className="p-0.5 hover:bg-[#3e3e3e] rounded text-zinc-600 hover:text-zinc-400"
+                    className="p-0.5 hover:bg-[#3e3e3e] rounded text-zinc-600 hover:text-[var(--muted)]"
                     title="Clear Input"
                   >
                     <Trash2 size={10} />
@@ -212,11 +212,11 @@ export default function CodeEditor({ content, onChange, readOnly, syncStatus = '
             {/* Output Section */}
             <div className="w-1/2 flex flex-col">
               <div className="flex items-center justify-between px-3 py-1.5 bg-[#2d2d2d] border-b border-[#3e3e3e]">
-                <span className="text-xs font-medium text-zinc-500 uppercase tracking-wider">Output</span>
+                <span className="text-xs font-medium text-[var(--muted)] uppercase tracking-wider">Output</span>
                 {output && (
                   <button 
                     onClick={() => setOutput(null)}
-                    className="p-0.5 hover:bg-[#3e3e3e] rounded text-zinc-600 hover:text-zinc-400"
+                    className="p-0.5 hover:bg-[#3e3e3e] rounded text-zinc-600 hover:text-[var(--muted)]"
                     title="Clear Output"
                   >
                     <Trash2 size={10} />

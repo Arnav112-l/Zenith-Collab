@@ -116,9 +116,9 @@ export default function GoalsEditor({ content, onChange, readOnly }: GoalsEditor
   const renderDashboard = () => (
     <div className="grid md:grid-cols-3 gap-6 mb-8">
       {/* Daily Progress Donut */}
-      <div className="bg-[#18181b] border border-zinc-800 rounded-2xl p-6 flex flex-col items-center relative overflow-hidden">
+      <div className="bg-[var(--surface-2)] border border-zinc-800 rounded-2xl p-6 flex flex-col items-center relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-green-500 to-emerald-500" />
-        <h3 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
+        <h3 className="text-lg font-bold text-[var(--foreground)] mb-2 flex items-center gap-2">
           <Target className="w-5 h-5 text-green-500" /> Daily Habits
         </h3>
         <div className="h-40 w-full relative">
@@ -144,26 +144,26 @@ export default function GoalsEditor({ content, onChange, readOnly }: GoalsEditor
             </PieChart>
           </ResponsiveContainer>
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-            <span className="text-2xl font-bold text-white">{Math.round((stats.daily.done / stats.daily.target) * 100)}%</span>
-            <span className="text-xs text-zinc-500">Completed</span>
+            <span className="text-2xl font-bold text-[var(--foreground)]">{Math.round((stats.daily.done / stats.daily.target) * 100)}%</span>
+            <span className="text-xs text-[var(--muted)]">Completed</span>
           </div>
         </div>
         <div className="flex justify-between w-full mt-4 text-sm px-4">
           <div className="text-center">
-            <div className="text-zinc-400">Done</div>
+            <div className="text-[var(--muted)]">Done</div>
             <div className="font-bold text-green-500">{stats.daily.done}</div>
           </div>
           <div className="text-center">
-            <div className="text-zinc-400">Target</div>
-            <div className="font-bold text-white">{stats.daily.target}</div>
+            <div className="text-[var(--muted)]">Target</div>
+            <div className="font-bold text-[var(--foreground)]">{stats.daily.target}</div>
           </div>
         </div>
       </div>
 
       {/* Weekly Progress Donut */}
-      <div className="bg-[#18181b] border border-zinc-800 rounded-2xl p-6 flex flex-col items-center relative overflow-hidden">
+      <div className="bg-[var(--surface-2)] border border-zinc-800 rounded-2xl p-6 flex flex-col items-center relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 to-pink-500" />
-        <h3 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
+        <h3 className="text-lg font-bold text-[var(--foreground)] mb-2 flex items-center gap-2">
           <Trophy className="w-5 h-5 text-purple-500" /> Weekly Goals
         </h3>
         <div className="h-40 w-full relative">
@@ -189,53 +189,53 @@ export default function GoalsEditor({ content, onChange, readOnly }: GoalsEditor
             </PieChart>
           </ResponsiveContainer>
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-            <span className="text-2xl font-bold text-white">{Math.round((stats.weekly.done / stats.weekly.target) * 100)}%</span>
-            <span className="text-xs text-zinc-500">Completed</span>
+            <span className="text-2xl font-bold text-[var(--foreground)]">{Math.round((stats.weekly.done / stats.weekly.target) * 100)}%</span>
+            <span className="text-xs text-[var(--muted)]">Completed</span>
           </div>
         </div>
         <div className="flex justify-between w-full mt-4 text-sm px-4">
           <div className="text-center">
-            <div className="text-zinc-400">Done</div>
+            <div className="text-[var(--muted)]">Done</div>
             <div className="font-bold text-purple-500">{stats.weekly.done}</div>
           </div>
           <div className="text-center">
-            <div className="text-zinc-400">Target</div>
-            <div className="font-bold text-white">{stats.weekly.target}</div>
+            <div className="text-[var(--muted)]">Target</div>
+            <div className="font-bold text-[var(--foreground)]">{stats.weekly.target}</div>
           </div>
         </div>
       </div>
 
       {/* Summary / Add Goal */}
-      <div className="bg-[#18181b] border border-zinc-800 rounded-2xl p-6 flex flex-col justify-between relative overflow-hidden">
+      <div className="bg-[var(--surface-2)] border border-zinc-800 rounded-2xl p-6 flex flex-col justify-between relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-cyan-500" />
         <div>
-          <h3 className="text-lg font-bold text-white mb-4">Quick Add</h3>
+          <h3 className="text-lg font-bold text-[var(--foreground)] mb-4">Quick Add</h3>
           <div className="space-y-4">
             <div className="relative">
               <button
                 onClick={() => setShowTypeDropdown(!showTypeDropdown)}
-                className="w-full flex items-center justify-between bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 hover:border-zinc-600 transition-colors"
+                className="w-full flex items-center justify-between bg-[var(--surface-2)] border border-zinc-700 rounded-xl px-4 py-3 hover:border-zinc-600 transition-colors"
               >
                 <span className="text-sm font-medium capitalize flex items-center gap-2">
                   {goalType === 'daily' ? <Target size={16} className="text-green-500"/> : <Trophy size={16} className="text-purple-500"/>}
                   {goalType} Goal
                 </span>
-                <ChevronDown size={16} className={`text-zinc-500 transition-transform ${showTypeDropdown ? 'rotate-180' : ''}`} />
+                <ChevronDown size={16} className={`text-[var(--muted)] transition-transform ${showTypeDropdown ? 'rotate-180' : ''}`} />
               </button>
               
               {showTypeDropdown && (
                 <>
                   <div className="fixed inset-0 z-10" onClick={() => setShowTypeDropdown(false)} />
-                  <div className="absolute top-full left-0 mt-2 w-full bg-[#18181b] border border-zinc-700 rounded-xl shadow-xl overflow-hidden z-20 animate-in fade-in zoom-in-95 duration-100">
+                  <div className="absolute top-full left-0 mt-2 w-full bg-[var(--surface-2)] border border-zinc-700 rounded-xl shadow-xl overflow-hidden z-20 animate-in fade-in zoom-in-95 duration-100">
                     <button
                       onClick={() => { setGoalType('daily'); setShowTypeDropdown(false) }}
-                      className="w-full text-left px-4 py-3 text-sm hover:bg-zinc-800 text-zinc-300 hover:text-white flex items-center gap-2"
+                      className="w-full text-left px-4 py-3 text-sm hover:bg-zinc-800 text-zinc-300 hover:text-[var(--foreground)] flex items-center gap-2"
                     >
                       <Target size={16} className="text-green-500"/> Daily Habit
                     </button>
                     <button
                       onClick={() => { setGoalType('weekly'); setShowTypeDropdown(false) }}
-                      className="w-full text-left px-4 py-3 text-sm hover:bg-zinc-800 text-zinc-300 hover:text-white flex items-center gap-2"
+                      className="w-full text-left px-4 py-3 text-sm hover:bg-zinc-800 text-zinc-300 hover:text-[var(--foreground)] flex items-center gap-2"
                     >
                       <Trophy size={16} className="text-purple-500"/> Weekly Goal
                     </button>
@@ -251,7 +251,7 @@ export default function GoalsEditor({ content, onChange, readOnly }: GoalsEditor
                 onChange={(e) => setNewGoal(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && addGoal()}
                 placeholder={`New ${goalType} goal...`}
-                className="flex-1 bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-sm"
+                className="flex-1 bg-[var(--surface-2)] border border-zinc-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-sm"
               />
               <button
                 onClick={addGoal}
@@ -263,7 +263,7 @@ export default function GoalsEditor({ content, onChange, readOnly }: GoalsEditor
             </div>
           </div>
         </div>
-        <div className="mt-4 text-xs text-zinc-500 text-center">
+        <div className="mt-4 text-xs text-[var(--muted)] text-center">
           Tip: You can edit targets directly in the grid.
         </div>
       </div>
@@ -290,10 +290,10 @@ export default function GoalsEditor({ content, onChange, readOnly }: GoalsEditor
         
         {/* Quick Stats Summary */}
         <div className="grid grid-cols-2 gap-4">
-           <div className="bg-[#18181b] border border-zinc-800 rounded-2xl p-4 flex items-center justify-between">
+           <div className="bg-[var(--surface-2)] border border-zinc-800 rounded-2xl p-4 flex items-center justify-between">
               <div>
-                <p className="text-zinc-400 text-xs uppercase font-bold tracking-wider">Daily Progress</p>
-                <p className="text-2xl font-bold text-white mt-1">
+                <p className="text-[var(--muted)] text-xs uppercase font-bold tracking-wider">Daily Progress</p>
+                <p className="text-2xl font-bold text-[var(--foreground)] mt-1">
                   {Math.round((stats.daily.done / stats.daily.target) * 100)}%
                 </p>
               </div>
@@ -301,10 +301,10 @@ export default function GoalsEditor({ content, onChange, readOnly }: GoalsEditor
                 <Target size={16} className="text-green-500" />
               </div>
            </div>
-           <div className="bg-[#18181b] border border-zinc-800 rounded-2xl p-4 flex items-center justify-between">
+           <div className="bg-[var(--surface-2)] border border-zinc-800 rounded-2xl p-4 flex items-center justify-between">
               <div>
-                <p className="text-zinc-400 text-xs uppercase font-bold tracking-wider">Weekly Progress</p>
-                <p className="text-2xl font-bold text-white mt-1">
+                <p className="text-[var(--muted)] text-xs uppercase font-bold tracking-wider">Weekly Progress</p>
+                <p className="text-2xl font-bold text-[var(--foreground)] mt-1">
                   {Math.round((stats.weekly.done / stats.weekly.target) * 100)}%
                 </p>
               </div>
@@ -315,12 +315,12 @@ export default function GoalsEditor({ content, onChange, readOnly }: GoalsEditor
         </div>
 
         {/* Daily Habits */}
-        <div className="bg-[#18181b] border border-zinc-800 rounded-2xl overflow-hidden">
-          <div className="p-4 border-b border-zinc-800 bg-zinc-900/50 flex items-center justify-between">
-            <h3 className="font-bold text-white flex items-center gap-2">
+        <div className="bg-[var(--surface-2)] border border-zinc-800 rounded-2xl overflow-hidden">
+          <div className="p-4 border-b border-zinc-800 bg-[var(--surface-2)]/50 flex items-center justify-between">
+            <h3 className="font-bold text-[var(--foreground)] flex items-center gap-2">
               <Target className="w-5 h-5 text-green-500" /> 
               Today's Habits
-              <span className="text-zinc-500 font-normal text-sm">
+              <span className="text-[var(--muted)] font-normal text-sm">
                 ({new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })})
               </span>
             </h3>
@@ -339,7 +339,7 @@ export default function GoalsEditor({ content, onChange, readOnly }: GoalsEditor
                     const newHistory = { ...goal.history, [todayKey]: !isDone }
                     updateGoals(goals.map(g => g.id === goal.id ? { ...g, history: newHistory } : g))
                   }}
-                  className="group flex items-center gap-4 p-4 hover:bg-zinc-900/50 transition-colors cursor-pointer"
+                  className="group flex items-center gap-4 p-4 hover:bg-[var(--surface-2)]/50 transition-colors cursor-pointer"
                 >
                   <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${
                     isDone 
@@ -349,7 +349,7 @@ export default function GoalsEditor({ content, onChange, readOnly }: GoalsEditor
                     {isDone && <Check size={14} className="text-black stroke-[3]" />}
                   </div>
                   <span className={`flex-1 font-medium transition-colors ${
-                    isDone ? 'text-zinc-500 line-through' : 'text-zinc-200'
+                    isDone ? 'text-[var(--muted)] line-through' : 'text-zinc-200'
                   }`}>
                     {goal.text}
                   </span>
@@ -357,7 +357,7 @@ export default function GoalsEditor({ content, onChange, readOnly }: GoalsEditor
               )
             })}
             {dailyGoals.length === 0 && (
-              <div className="p-8 text-center text-zinc-500 italic">
+              <div className="p-8 text-center text-[var(--muted)] italic">
                 No daily habits set. Switch to Tracker view to add some!
               </div>
             )}
@@ -365,12 +365,12 @@ export default function GoalsEditor({ content, onChange, readOnly }: GoalsEditor
         </div>
 
         {/* Weekly Goals */}
-        <div className="bg-[#18181b] border border-zinc-800 rounded-2xl overflow-hidden">
-          <div className="p-4 border-b border-zinc-800 bg-zinc-900/50 flex items-center justify-between">
-            <h3 className="font-bold text-white flex items-center gap-2">
+        <div className="bg-[var(--surface-2)] border border-zinc-800 rounded-2xl overflow-hidden">
+          <div className="p-4 border-b border-zinc-800 bg-[var(--surface-2)]/50 flex items-center justify-between">
+            <h3 className="font-bold text-[var(--foreground)] flex items-center gap-2">
               <Trophy className="w-5 h-5 text-purple-500" /> 
               This Week's Goals
-              <span className="text-zinc-500 font-normal text-sm">
+              <span className="text-[var(--muted)] font-normal text-sm">
                 (Week {currentWeek})
               </span>
             </h3>
@@ -389,7 +389,7 @@ export default function GoalsEditor({ content, onChange, readOnly }: GoalsEditor
                     const newHistory = { ...goal.history, [weekKey]: !isDone }
                     updateGoals(goals.map(g => g.id === goal.id ? { ...g, history: newHistory } : g))
                   }}
-                  className="group flex items-center gap-4 p-4 hover:bg-zinc-900/50 transition-colors cursor-pointer"
+                  className="group flex items-center gap-4 p-4 hover:bg-[var(--surface-2)]/50 transition-colors cursor-pointer"
                 >
                   <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${
                     isDone 
@@ -399,7 +399,7 @@ export default function GoalsEditor({ content, onChange, readOnly }: GoalsEditor
                     {isDone && <Check size={14} className="text-black stroke-[3]" />}
                   </div>
                   <span className={`flex-1 font-medium transition-colors ${
-                    isDone ? 'text-zinc-500 line-through' : 'text-zinc-200'
+                    isDone ? 'text-[var(--muted)] line-through' : 'text-zinc-200'
                   }`}>
                     {goal.text}
                   </span>
@@ -407,7 +407,7 @@ export default function GoalsEditor({ content, onChange, readOnly }: GoalsEditor
               )
             })}
             {weeklyGoals.length === 0 && (
-              <div className="p-8 text-center text-zinc-500 italic">
+              <div className="p-8 text-center text-[var(--muted)] italic">
                 No weekly goals set. Switch to Tracker view to add some!
               </div>
             )}
@@ -415,8 +415,8 @@ export default function GoalsEditor({ content, onChange, readOnly }: GoalsEditor
         </div>
 
         {/* Quick Add (Reused from Dashboard but simplified) */}
-        <div className="bg-[#18181b] border border-zinc-800 rounded-2xl p-6">
-           <h3 className="text-sm font-bold text-zinc-400 uppercase tracking-wider mb-4">Quick Add Goal</h3>
+        <div className="bg-[var(--surface-2)] border border-zinc-800 rounded-2xl p-6">
+           <h3 className="text-sm font-bold text-[var(--muted)] uppercase tracking-wider mb-4">Quick Add Goal</h3>
            <div className="flex gap-2">
               <input
                 type="text"
@@ -424,12 +424,12 @@ export default function GoalsEditor({ content, onChange, readOnly }: GoalsEditor
                 onChange={(e) => setNewGoal(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && addGoal()}
                 placeholder="Add a new goal..."
-                className="flex-1 bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-sm"
+                className="flex-1 bg-[var(--surface-2)] border border-zinc-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-sm"
               />
               <select 
                 value={goalType}
                 onChange={(e) => setGoalType(e.target.value as 'daily' | 'weekly')}
-                className="bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                className="bg-[var(--surface-2)] border border-zinc-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
               >
                 <option value="daily">Daily</option>
                 <option value="weekly">Weekly</option>
@@ -466,7 +466,7 @@ export default function GoalsEditor({ content, onChange, readOnly }: GoalsEditor
               className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
                 selectedMonth === idx
                   ? 'bg-white text-black shadow-lg shadow-white/10'
-                  : 'bg-zinc-900 text-zinc-400 hover:bg-zinc-800 hover:text-white border border-zinc-800'
+                  : 'bg-[var(--surface-2)] text-[var(--muted)] hover:bg-zinc-800 hover:text-[var(--foreground)] border border-zinc-800'
               }`}
             >
               {month}
@@ -476,25 +476,25 @@ export default function GoalsEditor({ content, onChange, readOnly }: GoalsEditor
 
         {/* Daily Habits Grid */}
         <div className="space-y-2">
-          <h3 className="text-lg font-bold text-white flex items-center gap-2 px-1">
+          <h3 className="text-lg font-bold text-[var(--foreground)] flex items-center gap-2 px-1">
             <Target className="w-5 h-5 text-green-500" /> Daily Habits (1-{daysInMonth})
           </h3>
-          <div className="bg-[#18181b] border border-zinc-800 rounded-xl overflow-hidden shadow-sm">
+          <div className="bg-[var(--surface-2)] border border-zinc-800 rounded-xl overflow-hidden shadow-sm">
             <div className="overflow-x-auto custom-scrollbar">
               <table className="w-full text-sm border-collapse">
                 <thead>
-                  <tr className="bg-zinc-900/50 border-b border-zinc-800">
-                    <th className="px-4 py-3 text-left text-xs font-bold text-zinc-400 uppercase tracking-wider border-r border-zinc-800 min-w-[200px] sticky left-0 bg-[#18181b] z-20">
+                  <tr className="bg-[var(--surface-2)]/50 border-b border-zinc-800">
+                    <th className="px-4 py-3 text-left text-xs font-bold text-[var(--muted)] uppercase tracking-wider border-r border-zinc-800 min-w-[200px] sticky left-0 bg-[var(--surface-2)] z-20">
                       Goal Name
                     </th>
-                    <th className="px-2 py-3 text-center text-xs font-bold text-zinc-400 uppercase tracking-wider border-r border-zinc-800 min-w-[100px] sticky left-[200px] bg-[#18181b] z-20">
+                    <th className="px-2 py-3 text-center text-xs font-bold text-[var(--muted)] uppercase tracking-wider border-r border-zinc-800 min-w-[100px] sticky left-[200px] bg-[var(--surface-2)] z-20">
                       Progress
                     </th>
-                    <th className="px-2 py-3 text-center text-xs font-bold text-zinc-400 uppercase tracking-wider border-r border-zinc-800 min-w-[60px] sticky left-[300px] bg-[#18181b] z-20">
+                    <th className="px-2 py-3 text-center text-xs font-bold text-[var(--muted)] uppercase tracking-wider border-r border-zinc-800 min-w-[60px] sticky left-[300px] bg-[var(--surface-2)] z-20">
                       Target
                     </th>
                     {Array.from({ length: daysInMonth }, (_, i) => (
-                      <th key={i} className="px-1 py-3 text-center text-xs font-medium text-zinc-500 border-r border-zinc-800 min-w-[36px] w-[36px]">
+                      <th key={i} className="px-1 py-3 text-center text-xs font-medium text-[var(--muted)] border-r border-zinc-800 min-w-[36px] w-[36px]">
                         {i + 1}
                       </th>
                     ))}
@@ -510,11 +510,11 @@ export default function GoalsEditor({ content, onChange, readOnly }: GoalsEditor
                     const progress = Math.min(100, Math.round((doneCount / (goal.target || 1)) * 100))
 
                     return (
-                      <tr key={goal.id} className="group hover:bg-zinc-900/30 transition-colors">
-                        <td className="px-4 py-2 text-white font-medium text-sm border-r border-zinc-800 sticky left-0 bg-[#18181b] group-hover:bg-[#18181b] z-10 whitespace-nowrap">
+                      <tr key={goal.id} className="group hover:bg-[var(--surface-2)]/30 transition-colors">
+                        <td className="px-4 py-2 text-[var(--foreground)] font-medium text-sm border-r border-zinc-800 sticky left-0 bg-[var(--surface-2)] group-hover:bg-[var(--surface-2)] z-10 whitespace-nowrap">
                           {goal.text}
                         </td>
-                        <td className="px-2 py-2 border-r border-zinc-800 sticky left-[200px] bg-[#18181b] group-hover:bg-[#18181b] z-10">
+                        <td className="px-2 py-2 border-r border-zinc-800 sticky left-[200px] bg-[var(--surface-2)] group-hover:bg-[var(--surface-2)] z-10">
                           <div className="flex items-center gap-2">
                             <div className="flex-1 h-2 bg-zinc-800 rounded-full overflow-hidden">
                               <div 
@@ -522,15 +522,15 @@ export default function GoalsEditor({ content, onChange, readOnly }: GoalsEditor
                                 style={{ width: `${progress}%` }}
                               />
                             </div>
-                            <span className="text-xs text-zinc-400 w-8 text-right">{progress}%</span>
+                            <span className="text-xs text-[var(--muted)] w-8 text-right">{progress}%</span>
                           </div>
                         </td>
-                        <td className="px-2 py-2 border-r border-zinc-800 sticky left-[300px] bg-[#18181b] group-hover:bg-[#18181b] z-10 text-center">
+                        <td className="px-2 py-2 border-r border-zinc-800 sticky left-[300px] bg-[var(--surface-2)] group-hover:bg-[var(--surface-2)] z-10 text-center">
                           <input 
                             type="number"
                             value={goal.target}
                             onChange={(e) => updateGoalTarget(goal.id, parseInt(e.target.value) || 0)}
-                            className="w-12 bg-transparent text-center text-zinc-400 focus:text-white focus:outline-none border-b border-transparent focus:border-green-500 transition-colors"
+                            className="w-12 bg-transparent text-center text-[var(--muted)] focus:text-[var(--foreground)] focus:outline-none border-b border-transparent focus:border-green-500 transition-colors"
                           />
                         </td>
                         {Array.from({ length: daysInMonth }, (_, i) => {
@@ -565,7 +565,7 @@ export default function GoalsEditor({ content, onChange, readOnly }: GoalsEditor
                   })}
                   {dailyGoals.length === 0 && (
                     <tr>
-                      <td colSpan={daysInMonth + 4} className="px-4 py-8 text-center text-zinc-500 italic">
+                      <td colSpan={daysInMonth + 4} className="px-4 py-8 text-center text-[var(--muted)] italic">
                         No daily habits yet. Add one above!
                       </td>
                     </tr>
@@ -578,25 +578,25 @@ export default function GoalsEditor({ content, onChange, readOnly }: GoalsEditor
 
         {/* Weekly Goals Grid */}
         <div className="space-y-2">
-          <h3 className="text-lg font-bold text-white flex items-center gap-2 px-1">
+          <h3 className="text-lg font-bold text-[var(--foreground)] flex items-center gap-2 px-1">
             <Trophy className="w-5 h-5 text-purple-500" /> Weekly Goals (W1-W5)
           </h3>
-          <div className="bg-[#18181b] border border-zinc-800 rounded-xl overflow-hidden shadow-sm">
+          <div className="bg-[var(--surface-2)] border border-zinc-800 rounded-xl overflow-hidden shadow-sm">
             <div className="overflow-x-auto custom-scrollbar">
               <table className="w-full text-sm border-collapse">
                 <thead>
-                  <tr className="bg-zinc-900/50 border-b border-zinc-800">
-                    <th className="px-4 py-3 text-left text-xs font-bold text-zinc-400 uppercase tracking-wider border-r border-zinc-800 min-w-[200px] sticky left-0 bg-[#18181b] z-20">
+                  <tr className="bg-[var(--surface-2)]/50 border-b border-zinc-800">
+                    <th className="px-4 py-3 text-left text-xs font-bold text-[var(--muted)] uppercase tracking-wider border-r border-zinc-800 min-w-[200px] sticky left-0 bg-[var(--surface-2)] z-20">
                       Goal Name
                     </th>
-                    <th className="px-2 py-3 text-center text-xs font-bold text-zinc-400 uppercase tracking-wider border-r border-zinc-800 min-w-[100px] sticky left-[200px] bg-[#18181b] z-20">
+                    <th className="px-2 py-3 text-center text-xs font-bold text-[var(--muted)] uppercase tracking-wider border-r border-zinc-800 min-w-[100px] sticky left-[200px] bg-[var(--surface-2)] z-20">
                       Progress
                     </th>
-                    <th className="px-2 py-3 text-center text-xs font-bold text-zinc-400 uppercase tracking-wider border-r border-zinc-800 min-w-[60px] sticky left-[300px] bg-[#18181b] z-20">
+                    <th className="px-2 py-3 text-center text-xs font-bold text-[var(--muted)] uppercase tracking-wider border-r border-zinc-800 min-w-[60px] sticky left-[300px] bg-[var(--surface-2)] z-20">
                       Target
                     </th>
                     {Array.from({ length: 5 }, (_, i) => (
-                      <th key={i} className="px-1 py-3 text-center text-xs font-medium text-zinc-500 border-r border-zinc-800 min-w-[60px]">
+                      <th key={i} className="px-1 py-3 text-center text-xs font-medium text-[var(--muted)] border-r border-zinc-800 min-w-[60px]">
                         Week {i + 1}
                       </th>
                     ))}
@@ -612,11 +612,11 @@ export default function GoalsEditor({ content, onChange, readOnly }: GoalsEditor
                     const progress = Math.min(100, Math.round((doneCount / (goal.target || 1)) * 100))
 
                     return (
-                      <tr key={goal.id} className="group hover:bg-zinc-900/30 transition-colors">
-                        <td className="px-4 py-2 text-white font-medium text-sm border-r border-zinc-800 sticky left-0 bg-[#18181b] group-hover:bg-[#18181b] z-10 whitespace-nowrap">
+                      <tr key={goal.id} className="group hover:bg-[var(--surface-2)]/30 transition-colors">
+                        <td className="px-4 py-2 text-[var(--foreground)] font-medium text-sm border-r border-zinc-800 sticky left-0 bg-[var(--surface-2)] group-hover:bg-[var(--surface-2)] z-10 whitespace-nowrap">
                           {goal.text}
                         </td>
-                        <td className="px-2 py-2 border-r border-zinc-800 sticky left-[200px] bg-[#18181b] group-hover:bg-[#18181b] z-10">
+                        <td className="px-2 py-2 border-r border-zinc-800 sticky left-[200px] bg-[var(--surface-2)] group-hover:bg-[var(--surface-2)] z-10">
                           <div className="flex items-center gap-2">
                             <div className="flex-1 h-2 bg-zinc-800 rounded-full overflow-hidden">
                               <div 
@@ -624,15 +624,15 @@ export default function GoalsEditor({ content, onChange, readOnly }: GoalsEditor
                                 style={{ width: `${progress}%` }}
                               />
                             </div>
-                            <span className="text-xs text-zinc-400 w-8 text-right">{progress}%</span>
+                            <span className="text-xs text-[var(--muted)] w-8 text-right">{progress}%</span>
                           </div>
                         </td>
-                        <td className="px-2 py-2 border-r border-zinc-800 sticky left-[300px] bg-[#18181b] group-hover:bg-[#18181b] z-10 text-center">
+                        <td className="px-2 py-2 border-r border-zinc-800 sticky left-[300px] bg-[var(--surface-2)] group-hover:bg-[var(--surface-2)] z-10 text-center">
                           <input 
                             type="number"
                             value={goal.target}
                             onChange={(e) => updateGoalTarget(goal.id, parseInt(e.target.value) || 0)}
-                            className="w-12 bg-transparent text-center text-zinc-400 focus:text-white focus:outline-none border-b border-transparent focus:border-purple-500 transition-colors"
+                            className="w-12 bg-transparent text-center text-[var(--muted)] focus:text-[var(--foreground)] focus:outline-none border-b border-transparent focus:border-purple-500 transition-colors"
                           />
                         </td>
                         {Array.from({ length: 5 }, (_, i) => {
@@ -667,7 +667,7 @@ export default function GoalsEditor({ content, onChange, readOnly }: GoalsEditor
                   })}
                   {weeklyGoals.length === 0 && (
                     <tr>
-                      <td colSpan={9} className="px-4 py-8 text-center text-zinc-500 italic">
+                      <td colSpan={9} className="px-4 py-8 text-center text-[var(--muted)] italic">
                         No weekly goals yet. Add one above!
                       </td>
                     </tr>
@@ -682,7 +682,7 @@ export default function GoalsEditor({ content, onChange, readOnly }: GoalsEditor
   }
 
   return (
-    <div className="h-full bg-[#0a0a0a] text-white p-6 overflow-y-auto">
+    <div className="h-full bg-[var(--background)] text-[var(--foreground)] p-6 overflow-y-auto">
       <div className="max-w-[1400px] mx-auto space-y-8">
         {/* Header & View Switcher */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
@@ -691,16 +691,16 @@ export default function GoalsEditor({ content, onChange, readOnly }: GoalsEditor
               <Trophy className="w-6 h-6 text-yellow-500" />
               Goals Tracker {currentYear}
             </h2>
-            <p className="text-zinc-400">Track your daily habits and weekly goals</p>
+            <p className="text-[var(--muted)]">Track your daily habits and weekly goals</p>
           </div>
           
-          <div className="flex bg-[#18181b] p-1 rounded-xl border border-zinc-800">
+          <div className="flex bg-[var(--surface-2)] p-1 rounded-xl border border-zinc-800">
             <button
               onClick={() => setViewMode('simple')}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                 viewMode === 'simple' 
-                  ? 'bg-zinc-800 text-white shadow-sm' 
-                  : 'text-zinc-400 hover:text-white'
+                  ? 'bg-zinc-800 text-[var(--foreground)] shadow-sm' 
+                  : 'text-[var(--muted)] hover:text-[var(--foreground)]'
               }`}
             >
               <List size={16} />
@@ -710,8 +710,8 @@ export default function GoalsEditor({ content, onChange, readOnly }: GoalsEditor
               onClick={() => setViewMode('tracker')}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                 viewMode === 'tracker' 
-                  ? 'bg-zinc-800 text-white shadow-sm' 
-                  : 'text-zinc-400 hover:text-white'
+                  ? 'bg-zinc-800 text-[var(--foreground)] shadow-sm' 
+                  : 'text-[var(--muted)] hover:text-[var(--foreground)]'
               }`}
             >
               <LayoutGrid size={16} />

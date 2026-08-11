@@ -368,7 +368,7 @@ export default function KanbanEditor({ content, onChange, readOnly }: KanbanEdit
             {!readOnly && (
               <button
                 onClick={addColumn}
-                className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded transition-all duration-200 text-sm font-medium hover:scale-105 active:scale-95 hover:shadow-lg"
+                className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-[var(--foreground)] rounded transition-all duration-200 text-sm font-medium hover:scale-105 active:scale-95 hover:shadow-lg"
               >
                 <Plus size={16} />
                 Create
@@ -625,7 +625,7 @@ function KanbanColumn({
                   onDeleteColumn();
                   setShowDeleteConfirm(false);
                 }}
-                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-all duration-150 hover:scale-105 font-medium"
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-[var(--foreground)] rounded-lg transition-all duration-150 hover:scale-105 font-medium"
               >
                 Delete
               </button>
@@ -758,7 +758,7 @@ function TaskCard({ task, isDragging }: { task: Task; isDragging?: boolean }) {
       <div className="flex items-start justify-between mb-2">
         <h4 className="text-gray-800 font-normal text-sm line-clamp-2 flex-1">{task.title}</h4>
         {task.assignedTo && (
-          <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white text-xs font-semibold ml-2 flex-shrink-0">
+          <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-[var(--foreground)] text-xs font-semibold ml-2 flex-shrink-0">
             {task.assignedTo.charAt(0).toUpperCase()}
           </div>
         )}
@@ -782,7 +782,7 @@ function TaskCard({ task, isDragging }: { task: Task; isDragging?: boolean }) {
       <div className="flex items-center gap-2 text-xs text-gray-600 mt-2">
         {/* ID Badge */}
         <span className="flex items-center gap-1 text-gray-500">
-          <div className="w-4 h-4 bg-green-500 rounded-sm flex items-center justify-center text-white text-[10px] font-bold">
+          <div className="w-4 h-4 bg-green-500 rounded-sm flex items-center justify-center text-[var(--foreground)] text-[10px] font-bold">
             ✓
           </div>
           <span className="font-medium">NOTE-{task.taskNumber || '000'}</span>
@@ -847,7 +847,7 @@ function TaskModal({
         <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-5 h-5 bg-blue-600 rounded flex items-center justify-center">
-              <span className="text-white text-xs">✓</span>
+              <span className="text-[var(--foreground)] text-xs">✓</span>
             </div>
             <div className="flex items-center gap-1">
               <span className="text-lg font-semibold text-gray-800">NOTE-</span>
@@ -864,7 +864,7 @@ function TaskModal({
               )}
             </div>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors p-1">
+          <button onClick={onClose} className="text-[var(--muted)] hover:text-gray-600 transition-colors p-1">
             <X size={20} />
           </button>
         </div>
@@ -972,7 +972,7 @@ function TaskModal({
                 <label className="text-gray-600 text-xs font-semibold mb-2 block uppercase">Assignee</label>
                 <div className="flex items-center gap-2">
                   {formData.assignedTo && (
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white text-sm font-semibold">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-[var(--foreground)] text-sm font-semibold">
                       {formData.assignedTo.charAt(0).toUpperCase()}
                     </div>
                   )}
@@ -1023,7 +1023,7 @@ function TaskModal({
               </button>
               <button
                 onClick={handleSave}
-                className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors font-medium shadow-sm"
+                className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-[var(--foreground)] rounded transition-colors font-medium shadow-sm"
               >
                 Save
               </button>

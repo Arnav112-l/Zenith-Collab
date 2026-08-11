@@ -38,7 +38,8 @@ export default function CalendarEditor({ content, onChange, readOnly }: Calendar
   const [events, setEvents] = useState<Event[]>(() => {
     try {
       const parsed = content ? JSON.parse(content) : [];
-      return parsed.map((e: any) => ({
+      const list = Array.isArray(parsed) ? parsed : [];
+      return list.map((e: any) => ({
         ...e,
         start: new Date(e.start),
         end: new Date(e.end),
@@ -157,11 +158,11 @@ export default function CalendarEditor({ content, onChange, readOnly }: Calendar
   };
 
   return (
-    <div className="h-full w-full bg-[#0a0a0a] p-6 overflow-y-auto">
-      <div className="h-full flex flex-col bg-[#18181b] rounded-2xl border border-[#27272a] shadow-xl overflow-hidden relative">
+    <div className="h-full w-full bg-[var(--background)] p-6 overflow-y-auto">
+      <div className="h-full flex flex-col bg-[var(--surface-2)] rounded-2xl border border-[var(--border)] shadow-xl overflow-hidden relative">
         <style jsx global>{`
           .rbc-calendar {
-            color: #e4e4e7;
+            color: var(--foreground);
             font-family: inherit;
           }
           
@@ -169,13 +170,13 @@ export default function CalendarEditor({ content, onChange, readOnly }: Calendar
           .rbc-toolbar {
             padding: 20px;
             margin-bottom: 0;
-            border-bottom: 1px solid #27272a;
-            background: #18181b;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface-2);
           }
           
           .rbc-toolbar button {
-            color: #a1a1aa;
-            border: 1px solid #3f3f46;
+            color: var(--muted);
+            border: 1px solid var(--border-strong);
             border-radius: 8px;
             padding: 8px 16px;
             font-size: 14px;
@@ -183,9 +184,9 @@ export default function CalendarEditor({ content, onChange, readOnly }: Calendar
           }
           
           .rbc-toolbar button:hover {
-            background-color: #27272a;
-            color: #fff;
-            border-color: #52525b;
+            background-color: var(--surface-3);
+            color: var(--foreground);
+            border-color: var(--border-strong);
           }
           
           .rbc-toolbar button.rbc-active {
@@ -198,33 +199,33 @@ export default function CalendarEditor({ content, onChange, readOnly }: Calendar
           /* Month View */
           .rbc-month-view {
             border: none;
-            background: #18181b;
+            background: var(--surface-2);
           }
 
           .rbc-header {
             padding: 12px;
             font-weight: 600;
-            color: #71717a;
-            border-bottom: 1px solid #27272a;
+            color: var(--muted);
+            border-bottom: 1px solid var(--border);
             font-size: 12px;
             text-transform: uppercase;
             letter-spacing: 1px;
           }
 
           .rbc-month-row {
-            border-top: 1px solid #27272a;
+            border-top: 1px solid var(--border);
           }
 
           .rbc-day-bg {
-            border-left: 1px solid #27272a;
+            border-left: 1px solid var(--border);
           }
 
           .rbc-day-bg:hover {
-            background-color: #27272a;
+            background-color: var(--surface-3);
           }
 
           .rbc-off-range-bg {
-            background-color: #0f0f11;
+            background-color: var(--surface);
           }
 
           .rbc-today {
@@ -234,7 +235,7 @@ export default function CalendarEditor({ content, onChange, readOnly }: Calendar
           .rbc-date-cell {
             padding: 8px;
             font-size: 14px;
-            color: #a1a1aa;
+            color: var(--muted);
           }
 
           .rbc-now .rbc-date-cell a {
@@ -245,28 +246,28 @@ export default function CalendarEditor({ content, onChange, readOnly }: Calendar
           /* Time View */
           .rbc-time-view {
             border: none;
-            background: #18181b;
+            background: var(--surface-2);
           }
 
           .rbc-time-header {
-            border-bottom: 1px solid #27272a;
+            border-bottom: 1px solid var(--border);
           }
 
           .rbc-time-content {
-            border-top: 1px solid #27272a;
+            border-top: 1px solid var(--border);
           }
 
           .rbc-timeslot-group {
-            border-left: 1px solid #27272a;
-            border-bottom: 1px solid #27272a;
+            border-left: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
           }
 
           .rbc-time-slot {
-            border-top: 1px solid #27272a;
+            border-top: 1px solid var(--border);
           }
 
           .rbc-label {
-            color: #71717a;
+            color: var(--muted);
           }
 
           /* Agenda View */
@@ -286,7 +287,7 @@ export default function CalendarEditor({ content, onChange, readOnly }: Calendar
           .rbc-agenda-table tbody > tr {
             display: block;
             margin-bottom: 12px;
-            background: #18181b;
+            background: var(--surface-2);
             border: 1px solid #27272a;
             border-radius: 12px;
             overflow: hidden;
@@ -308,7 +309,7 @@ export default function CalendarEditor({ content, onChange, readOnly }: Calendar
 
           .rbc-agenda-date-cell {
             font-weight: 700;
-            color: #e4e4e7;
+            color: var(--foreground);
             font-size: 14px;
             width: 150px;
             text-transform: uppercase;
@@ -316,7 +317,7 @@ export default function CalendarEditor({ content, onChange, readOnly }: Calendar
           }
 
           .rbc-agenda-time-cell {
-            color: #a1a1aa;
+            color: var(--muted);
             font-size: 13px;
             font-family: monospace;
             width: 120px;
@@ -324,7 +325,7 @@ export default function CalendarEditor({ content, onChange, readOnly }: Calendar
 
           .rbc-agenda-event-cell {
             font-weight: 500;
-            color: #fff;
+            color: var(--foreground);
             font-size: 15px;
           }
         `}</style>
@@ -357,40 +358,40 @@ export default function CalendarEditor({ content, onChange, readOnly }: Calendar
             toolbar: (props) => {
               const { label, onNavigate, onView, views, view } = props;
               return (
-                <div className="flex flex-col md:flex-row items-center justify-between p-4 border-b border-[#27272a] gap-4 bg-[#18181b]">
+                <div className="flex flex-col md:flex-row items-center justify-between p-4 border-b border-[var(--border)] gap-4 bg-[var(--surface-2)]">
                   <div className="flex items-center gap-2">
                     <button 
                       onClick={() => onNavigate(Navigate.TODAY)}
-                      className="px-4 py-2 bg-[#27272a] hover:bg-[#3f3f46] text-white rounded-xl text-sm font-medium transition-colors"
+                      className="px-4 py-2 bg-[var(--surface-2)] hover:bg-[#3f3f46] text-[var(--foreground)] rounded-xl text-sm font-medium transition-colors"
                     >
                       Today
                     </button>
-                    <div className="flex items-center bg-[#27272a] rounded-xl p-1">
+                    <div className="flex items-center bg-[var(--surface-2)] rounded-xl p-1">
                       <button 
                         onClick={() => onNavigate(Navigate.PREVIOUS)}
-                        className="p-1.5 hover:bg-[#3f3f46] text-gray-400 hover:text-white rounded-lg transition-colors"
+                        className="p-1.5 hover:bg-[#3f3f46] text-[var(--muted)] hover:text-[var(--foreground)] rounded-lg transition-colors"
                       >
                         <ChevronLeft size={18} />
                       </button>
                       <button 
                         onClick={() => onNavigate(Navigate.NEXT)}
-                        className="p-1.5 hover:bg-[#3f3f46] text-gray-400 hover:text-white rounded-lg transition-colors"
+                        className="p-1.5 hover:bg-[#3f3f46] text-[var(--muted)] hover:text-[var(--foreground)] rounded-lg transition-colors"
                       >
                         <ChevronRight size={18} />
                       </button>
                     </div>
-                    <h2 className="text-xl font-bold text-white ml-2">{label}</h2>
+                    <h2 className="text-xl font-bold text-[var(--foreground)] ml-2">{label}</h2>
                   </div>
 
-                  <div className="flex items-center gap-2 bg-[#27272a] p-1 rounded-xl">
+                  <div className="flex items-center gap-2 bg-[var(--surface-2)] p-1 rounded-xl">
                     {(views as any[]).map((name: string) => (
                       <button
                         key={name}
                         onClick={() => onView(name as any)}
                         className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all ${
                           view === name 
-                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' 
-                            : 'text-gray-400 hover:text-white hover:bg-[#3f3f46]'
+                            ? 'bg-blue-600 text-[var(--foreground)] shadow-lg shadow-blue-500/20' 
+                            : 'text-[var(--muted)] hover:text-[var(--foreground)] hover:bg-[#3f3f46]'
                         }`}
                       >
                         {name.charAt(0).toUpperCase() + name.slice(1)}
@@ -407,10 +408,10 @@ export default function CalendarEditor({ content, onChange, readOnly }: Calendar
       {/* Event Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="bg-[#18181b] border border-[#27272a] rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
+          <div className="bg-[var(--surface-2)] border border-[var(--border)] rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
             <div className="p-6 space-y-6">
               <div className="flex items-center justify-between">
-                <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                <h3 className="text-xl font-bold text-[var(--foreground)] flex items-center gap-2">
                   {editingEvent ? "Edit Event" : "New Event"}
                 </h3>
                 <button 
@@ -418,7 +419,7 @@ export default function CalendarEditor({ content, onChange, readOnly }: Calendar
                     setShowModal(false);
                     setEditingEvent(null);
                   }} 
-                  className="text-gray-400 hover:text-white transition-colors p-2 hover:bg-[#27272a] rounded-lg"
+                  className="text-[var(--muted)] hover:text-[var(--foreground)] transition-colors p-2 hover:bg-[var(--surface-2)] rounded-lg"
                 >
                   <X size={20} />
                 </button>
@@ -432,7 +433,7 @@ export default function CalendarEditor({ content, onChange, readOnly }: Calendar
                     value={newEvent.title}
                     onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
                     placeholder="Event title"
-                    className="w-full bg-[#27272a] text-white rounded-xl px-4 py-3 border border-[#3f3f46] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all placeholder:text-gray-600"
+                    className="w-full bg-[var(--surface-2)] text-[var(--foreground)] rounded-xl px-4 py-3 border border-[#3f3f46] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all placeholder:text-gray-600"
                     autoFocus
                   />
                 </div>
@@ -448,7 +449,7 @@ export default function CalendarEditor({ content, onChange, readOnly }: Calendar
                           const currentTime = moment(newEvent.start).format("HH:mm");
                           setNewEvent({ ...newEvent, start: new Date(`${e.target.value}T${currentTime}`) });
                         }}
-                        className="w-full bg-[#27272a] text-white rounded-xl px-3 py-2.5 border border-[#3f3f46] focus:outline-none focus:border-blue-500 transition-all text-sm"
+                        className="w-full bg-[var(--surface-2)] text-[var(--foreground)] rounded-xl px-3 py-2.5 border border-[#3f3f46] focus:outline-none focus:border-blue-500 transition-all text-sm"
                       />
                       <input
                         type="time"
@@ -457,7 +458,7 @@ export default function CalendarEditor({ content, onChange, readOnly }: Calendar
                           const currentDate = moment(newEvent.start).format("YYYY-MM-DD");
                           setNewEvent({ ...newEvent, start: new Date(`${currentDate}T${e.target.value}`) });
                         }}
-                        className="w-full bg-[#27272a] text-white rounded-xl px-3 py-2.5 border border-[#3f3f46] focus:outline-none focus:border-blue-500 transition-all text-sm"
+                        className="w-full bg-[var(--surface-2)] text-[var(--foreground)] rounded-xl px-3 py-2.5 border border-[#3f3f46] focus:outline-none focus:border-blue-500 transition-all text-sm"
                       />
                     </div>
                   </div>
@@ -471,7 +472,7 @@ export default function CalendarEditor({ content, onChange, readOnly }: Calendar
                           const currentTime = moment(newEvent.end).format("HH:mm");
                           setNewEvent({ ...newEvent, end: new Date(`${e.target.value}T${currentTime}`) });
                         }}
-                        className="w-full bg-[#27272a] text-white rounded-xl px-3 py-2.5 border border-[#3f3f46] focus:outline-none focus:border-blue-500 transition-all text-sm"
+                        className="w-full bg-[var(--surface-2)] text-[var(--foreground)] rounded-xl px-3 py-2.5 border border-[#3f3f46] focus:outline-none focus:border-blue-500 transition-all text-sm"
                       />
                       <input
                         type="time"
@@ -480,7 +481,7 @@ export default function CalendarEditor({ content, onChange, readOnly }: Calendar
                           const currentDate = moment(newEvent.end).format("YYYY-MM-DD");
                           setNewEvent({ ...newEvent, end: new Date(`${currentDate}T${e.target.value}`) });
                         }}
-                        className="w-full bg-[#27272a] text-white rounded-xl px-3 py-2.5 border border-[#3f3f46] focus:outline-none focus:border-blue-500 transition-all text-sm"
+                        className="w-full bg-[var(--surface-2)] text-[var(--foreground)] rounded-xl px-3 py-2.5 border border-[#3f3f46] focus:outline-none focus:border-blue-500 transition-all text-sm"
                       />
                     </div>
                   </div>
@@ -512,19 +513,19 @@ export default function CalendarEditor({ content, onChange, readOnly }: Calendar
                     onChange={(e) => setNewEvent({ ...newEvent, desc: e.target.value })}
                     placeholder="Add notes..."
                     rows={3}
-                    className="w-full bg-[#27272a] text-white rounded-xl px-4 py-3 border border-[#3f3f46] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all placeholder:text-gray-600 resize-none"
+                    className="w-full bg-[var(--surface-2)] text-[var(--foreground)] rounded-xl px-4 py-3 border border-[#3f3f46] focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all placeholder:text-gray-600 resize-none"
                   />
                 </div>
 
-                <div className="flex items-center gap-3 p-3 bg-[#27272a]/50 rounded-xl border border-[#27272a]">
+                <div className="flex items-center gap-3 p-3 bg-[var(--surface-2)] rounded-xl border border-[var(--border)]">
                   <Bell size={18} className="text-blue-500" />
                   <div className="flex-1">
-                    <label className="flex items-center gap-2 text-sm font-medium text-gray-300 cursor-pointer">
+                    <label className="flex items-center gap-2 text-sm font-medium text-[var(--muted-strong)] cursor-pointer">
                       <input
                         type="checkbox"
                         checked={newEvent.emailNotification !== false}
                         onChange={(e) => setNewEvent({ ...newEvent, emailNotification: e.target.checked })}
-                        className="rounded border-gray-600 bg-[#18181b] text-blue-600 focus:ring-blue-500"
+                        className="rounded border-gray-600 bg-[var(--surface-2)] text-blue-600 focus:ring-blue-500"
                       />
                       Email Reminder
                     </label>
@@ -533,7 +534,7 @@ export default function CalendarEditor({ content, onChange, readOnly }: Calendar
                     <select
                       value={newEvent.notifyBefore || 1440}
                       onChange={(e) => setNewEvent({ ...newEvent, notifyBefore: Number(e.target.value) })}
-                      className="bg-[#18181b] text-white text-sm rounded-lg border border-[#3f3f46] px-2 py-1 focus:outline-none focus:border-blue-500"
+                      className="bg-[var(--surface-2)] text-[var(--foreground)] text-sm rounded-lg border border-[#3f3f46] px-2 py-1 focus:outline-none focus:border-blue-500"
                     >
                       <option value={15}>15m before</option>
                       <option value={60}>1h before</option>
@@ -557,13 +558,13 @@ export default function CalendarEditor({ content, onChange, readOnly }: Calendar
                     setShowModal(false);
                     setEditingEvent(null);
                   }}
-                  className="flex-1 bg-[#27272a] hover:bg-[#3f3f46] text-white font-medium py-3 rounded-xl transition-all"
+                  className="flex-1 bg-[var(--surface-2)] hover:bg-[#3f3f46] text-[var(--foreground)] font-medium py-3 rounded-xl transition-all"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleSaveEvent}
-                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-xl transition-all shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2"
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-[var(--foreground)] font-medium py-3 rounded-xl transition-all shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2"
                 >
                   <Save size={18} />
                   {editingEvent ? "Update Event" : "Save Event"}
@@ -577,9 +578,9 @@ export default function CalendarEditor({ content, onChange, readOnly }: Calendar
       {/* Delete Confirmation Modal */}
       {showDeleteModal && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="bg-[#18181b] border border-[#27272a] rounded-2xl shadow-2xl w-full max-w-sm p-6 animate-in zoom-in-95 duration-200">
-            <h3 className="text-xl font-bold text-white mb-2">Delete Event?</h3>
-            <p className="text-gray-400 mb-6">
+          <div className="bg-[var(--surface-2)] border border-[var(--border)] rounded-2xl shadow-2xl w-full max-w-sm p-6 animate-in zoom-in-95 duration-200">
+            <h3 className="text-xl font-bold text-[var(--foreground)] mb-2">Delete Event?</h3>
+            <p className="text-[var(--muted)] mb-6">
               Are you sure you want to delete this event? This action cannot be undone.
             </p>
             <div className="flex gap-3">
@@ -589,13 +590,13 @@ export default function CalendarEditor({ content, onChange, readOnly }: Calendar
                   setEventToDelete(null);
                   setShowModal(true);
                 }}
-                className="flex-1 bg-[#27272a] hover:bg-[#3f3f46] text-white font-medium py-2.5 rounded-xl transition-all"
+                className="flex-1 bg-[var(--surface-2)] hover:bg-[#3f3f46] text-[var(--foreground)] font-medium py-2.5 rounded-xl transition-all"
               >
                 Cancel
               </button>
               <button
                 onClick={handleDeleteEvent}
-                className="flex-1 bg-red-600 hover:bg-red-700 text-white font-medium py-2.5 rounded-xl transition-all shadow-lg shadow-red-600/20"
+                className="flex-1 bg-red-600 hover:bg-red-700 text-[var(--foreground)] font-medium py-2.5 rounded-xl transition-all shadow-lg shadow-red-600/20"
               >
                 Delete
               </button>

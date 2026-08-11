@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { Sidebar, SidebarBody, SidebarLink, useSidebar } from "@/components/ui/sidebar";
-import { FileText, PlusCircle, Home, Trash2, CheckSquare, Square, FileType, Hash, Users, Clock, Folder, Search, Archive } from "lucide-react";
+import { FileText, PlusCircle, Trash2, CheckSquare, Square, FileType, Hash, Users, Folder, Search, Archive } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -50,21 +50,21 @@ function DocumentLink({ doc, currentDocId, onDelete, isSelectionMode, isSelected
         <div
           onClick={handleClick}
           className={cn(
-            "flex items-center justify-start gap-2 py-2 pr-8 cursor-pointer hover:bg-[#27272a] rounded-lg transition-colors",
-            isSelected && "bg-[#f472b6]/10"
+            "flex items-center justify-start gap-2 py-2 pr-8 cursor-pointer hover:bg-[var(--surface-2)] dark:hover:bg-[var(--surface-3)] rounded-lg transition-colors",
+            isSelected && "bg-[var(--accent-soft)]"
           )}
         >
           {isSelected ? (
-            <CheckSquare className="h-5 w-5 flex-shrink-0 text-[#f472b6]" />
+            <CheckSquare className="h-5 w-5 flex-shrink-0 text-[var(--accent)]" />
           ) : (
-            <Square className="h-5 w-5 flex-shrink-0 text-[#52525b]" />
+            <Square className="h-5 w-5 flex-shrink-0 text-[var(--muted)]" />
           )}
           <motion.span
             animate={{
               display: open ? "inline-block" : "none",
               opacity: open ? 1 : 0,
             }}
-            className="text-sm whitespace-pre inline-block !p-0 !m-0 truncate text-[#a1a1aa]"
+            className="text-sm whitespace-pre inline-block !p-0 !m-0 truncate text-[var(--foreground)]"
           >
             {doc.title}
           </motion.span>
@@ -74,12 +74,16 @@ function DocumentLink({ doc, currentDocId, onDelete, isSelectionMode, isSelected
           href={`/documents/${doc.id}`}
           className={cn(
             "flex items-center justify-start gap-2 group/sidebar py-2 pr-8 rounded-lg transition-colors",
-            currentDocId === doc.id ? "bg-[#f472b6]/10" : "hover:bg-[#27272a]"
+            currentDocId === doc.id
+              ? "bg-[var(--accent-soft)]"
+              : "hover:bg-[var(--surface-2)] dark:hover:bg-[var(--surface-3)]"
           )}
         >
           <FileText className={cn(
             "h-5 w-5 flex-shrink-0",
-            currentDocId === doc.id ? "text-[#f472b6]" : "text-[#52525b] group-hover/sidebar:text-[#a1a1aa]"
+            currentDocId === doc.id
+              ? "text-[var(--accent)]"
+              : "text-[var(--muted)] group-hover/sidebar:text-[var(--muted-strong)]"
           )} />
           <motion.span
             animate={{
@@ -88,7 +92,9 @@ function DocumentLink({ doc, currentDocId, onDelete, isSelectionMode, isSelected
             }}
             className={cn(
               "text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0 truncate",
-              currentDocId === doc.id ? "text-[#f472b6] font-medium" : "text-[#a1a1aa]"
+              currentDocId === doc.id
+                ? "text-[var(--accent)] font-medium"
+                : "text-[var(--foreground)]"
             )}
           >
             {doc.title}
@@ -101,7 +107,7 @@ function DocumentLink({ doc, currentDocId, onDelete, isSelectionMode, isSelected
             e.preventDefault();
             onDelete(doc.id);
           }}
-          className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-red-500 hover:bg-red-500/10 rounded opacity-0 group-hover/item:opacity-100 transition-opacity"
+          className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-[var(--danger)] hover:bg-[color-mix(in_srgb,var(--danger)_10%,transparent)] rounded opacity-0 group-hover/item:opacity-100 transition-opacity"
           title="Delete document"
         >
           <Trash2 className="h-4 w-4" />
@@ -139,9 +145,9 @@ function StatsDisplay({ documentId }: { documentId: string }) {
   }, [documentId]);
 
   const statItems = [
-    { icon: FileType, label: 'Words', value: stats.wordCount.toLocaleString(), color: 'text-violet-400' },
-    { icon: Hash, label: 'Characters', value: stats.charCount.toLocaleString(), color: 'text-orange-400' },
-    { icon: Users, label: 'Collaborators', value: stats.collaborators.toString(), color: 'text-green-400' },
+    { icon: FileType, label: 'Words', value: stats.wordCount.toLocaleString(), color: 'text-violet-500 dark:text-violet-400' },
+    { icon: Hash, label: 'Characters', value: stats.charCount.toLocaleString(), color: 'text-orange-500 dark:text-orange-400' },
+    { icon: Users, label: 'Collaborators', value: stats.collaborators.toString(), color: 'text-green-600 dark:text-green-400' },
   ];
 
   return (
@@ -149,12 +155,12 @@ function StatsDisplay({ documentId }: { documentId: string }) {
       {statItems.map((stat, idx) => (
         <div
           key={idx}
-          className="flex items-center gap-3 px-3 py-2 bg-[#0a0a0a] rounded-lg border border-[#27272a]"
+          className="flex items-center gap-3 px-3 py-2 ui-panel-muted rounded-lg"
         >
           <stat.icon className={`h-4 w-4 ${stat.color}`} />
           <div className="flex-1 min-w-0">
-            <p className="text-xs text-[#52525b]">{stat.label}</p>
-            <p className="text-sm font-semibold text-white truncate">{stat.value}</p>
+            <p className="text-xs ui-muted">{stat.label}</p>
+            <p className="text-sm font-semibold text-[var(--foreground)] truncate">{stat.value}</p>
           </div>
         </div>
       ))}
@@ -348,18 +354,18 @@ export default function DocumentSidebar({ currentDocId, showStats = false }: { c
               <SidebarButton 
                 link={{
                   label: "New Note",
-                  icon: <PlusCircle className="text-black h-5 w-5" />,
+                  icon: <PlusCircle className="text-white h-5 w-5" />,
                 }}
                 onClick={createNewDocument}
-                className="bg-white hover:bg-neutral-200 text-black rounded-xl font-medium justify-center"
+                className="ui-btn-primary rounded-xl font-medium justify-center"
               />
               <SidebarButton 
                 link={{
                   label: "New Folder",
-                  icon: <Folder className="text-white h-5 w-5" />,
+                  icon: <Folder className="text-[var(--foreground)] h-5 w-5" />,
                 }}
                 onClick={createNewFolder}
-                className="bg-[#27272a] hover:bg-[#3f3f46] text-white rounded-xl font-medium"
+                className="ui-btn rounded-xl font-medium"
               />
             </div>
 
@@ -368,18 +374,18 @@ export default function DocumentSidebar({ currentDocId, showStats = false }: { c
               <SidebarButton 
                 link={{
                   label: "Search",
-                  icon: <Search className="text-[#52525b] h-4 w-4" />,
+                  icon: <Search className="text-[var(--muted)] h-4 w-4" />,
                 }}
                 onClick={() => {}} // TODO: Implement search
-                className="bg-[#18181b] border border-[#27272a] text-[#a1a1aa] rounded-xl hover:bg-[#27272a]"
+                className="ui-panel-muted text-[var(--muted)] rounded-xl hover:bg-[var(--surface-3)]"
               />
               <SidebarButton 
                 link={{
                   label: "Archive",
-                  icon: <Archive className="text-[#52525b] h-5 w-5" />,
+                  icon: <Archive className="text-[var(--muted)] h-5 w-5" />,
                 }}
                 onClick={() => {}} // TODO: Implement archive view
-                className="hover:bg-[#27272a] text-[#a1a1aa] rounded-lg"
+                className="hover:bg-[var(--surface-2)] dark:hover:bg-[var(--surface-3)] text-[var(--muted)] rounded-lg"
               />
             </div>
 
@@ -389,15 +395,15 @@ export default function DocumentSidebar({ currentDocId, showStats = false }: { c
                 link={{
                   label: "Dashboard",
                   href: "/dashboard",
-                  icon: <div className="h-2 w-2 rounded-full bg-[#f472b6]" />,
+                  icon: <div className="h-2 w-2 rounded-full bg-[var(--accent)]" />,
                 }}
-                className="bg-[#27272a] rounded-lg text-white font-medium"
+                className="bg-[var(--surface-2)] dark:bg-[var(--surface-3)] rounded-lg text-[var(--foreground)] font-medium"
               />
             </div>
 
             {/* Library Section */}
             <div className="mt-6">
-              <div className="px-2 mb-2 text-xs font-semibold text-[#52525b] uppercase tracking-wider">
+              <div className="px-2 mb-2 text-xs font-semibold ui-muted uppercase tracking-wider">
                 Library
               </div>
               <div className="flex flex-col gap-1">
@@ -405,25 +411,25 @@ export default function DocumentSidebar({ currentDocId, showStats = false }: { c
                   link={{
                     label: "All Notes",
                     href: "/dashboard", // Or specific filter
-                    icon: <div className="h-1.5 w-1.5 rounded-full bg-[#f472b6]" />,
+                    icon: <div className="h-1.5 w-1.5 rounded-full bg-[var(--accent)]" />,
                   }}
-                  className="bg-[#27272a]/50 hover:bg-[#27272a] rounded-lg text-white"
+                  className="bg-[var(--accent-soft)] hover:bg-[var(--surface-2)] dark:hover:bg-[var(--surface-3)] rounded-lg text-[var(--foreground)]"
                 />
                 <SidebarLink 
                   link={{
                     label: "Favorites",
                     href: "#",
-                    icon: <div className="h-1.5 w-1.5 rounded-full bg-[#52525b]" />,
+                    icon: <div className="h-1.5 w-1.5 rounded-full bg-[var(--muted)]" />,
                   }}
-                  className="hover:bg-[#27272a] rounded-lg text-[#a1a1aa]"
+                  className="hover:bg-[var(--surface-2)] dark:hover:bg-[var(--surface-3)] rounded-lg text-[var(--muted)]"
                 />
                 <SidebarLink 
                   link={{
                     label: "Trash",
                     href: "#",
-                    icon: <div className="h-1.5 w-1.5 rounded-full bg-[#52525b]" />,
+                    icon: <div className="h-1.5 w-1.5 rounded-full bg-[var(--muted)]" />,
                   }}
-                  className="hover:bg-[#27272a] rounded-lg text-[#a1a1aa]"
+                  className="hover:bg-[var(--surface-2)] dark:hover:bg-[var(--surface-3)] rounded-lg text-[var(--muted)]"
                 />
               </div>
             </div>
@@ -436,7 +442,7 @@ export default function DocumentSidebar({ currentDocId, showStats = false }: { c
                   animate={{ opacity: 1, y: 0 }}
                   className="space-y-2"
                 >
-                  <div className="text-xs font-semibold text-[#52525b] uppercase tracking-wider mb-3">
+                  <div className="text-xs font-semibold ui-muted uppercase tracking-wider mb-3">
                     Document Stats
                   </div>
                   <StatsDisplay documentId={currentDocId} />
@@ -453,7 +459,7 @@ export default function DocumentSidebar({ currentDocId, showStats = false }: { c
                       display: open ? "inline-block" : "none",
                       opacity: open ? 1 : 0,
                     }}
-                    className="text-xs font-semibold text-[#52525b] uppercase tracking-wider"
+                    className="text-xs font-semibold ui-muted uppercase tracking-wider"
                   >
                     Recent Documents
                   </motion.span>
@@ -465,8 +471,8 @@ export default function DocumentSidebar({ currentDocId, showStats = false }: { c
                       className={cn(
                         "text-xs px-2 py-1 rounded transition-colors",
                         isSelectionMode 
-                          ? "bg-[#f472b6]/10 text-[#f472b6]" 
-                          : "text-[#52525b] hover:bg-[#27272a]"
+                          ? "bg-[var(--accent-soft)] text-[var(--accent)]" 
+                          : "ui-muted hover:bg-[var(--surface-2)] dark:hover:bg-[var(--surface-3)]"
                       )}
                       title={isSelectionMode ? "Exit selection mode" : "Select multiple"}
                     >
@@ -484,24 +490,24 @@ export default function DocumentSidebar({ currentDocId, showStats = false }: { c
                   >
                     <button
                       onClick={selectAll}
-                      className="text-[#f472b6] hover:underline"
+                      className="text-[var(--accent)] hover:underline"
                     >
                       Select All
                     </button>
-                    <span className="text-[#52525b]">|</span>
+                    <span className="ui-muted">|</span>
                     <button
                       onClick={deselectAll}
-                      className="text-[#f472b6] hover:underline"
+                      className="text-[var(--accent)] hover:underline"
                     >
                       Deselect All
                     </button>
                     {selectedDocs.size > 0 && (
                       <>
-                        <span className="text-[#52525b]">|</span>
+                        <span className="ui-muted">|</span>
                         <button
                           onClick={handleBulkDelete}
                           disabled={isBulkDeleting}
-                          className="text-red-500 hover:underline disabled:opacity-50 flex items-center gap-1"
+                          className="text-[var(--danger)] hover:underline disabled:opacity-50 flex items-center gap-1"
                         >
                           <Trash2 className="h-3 w-3" />
                           Delete ({selectedDocs.size})
@@ -543,12 +549,12 @@ export default function DocumentSidebar({ currentDocId, showStats = false }: { c
                     alt="Avatar"
                   />
                 ) : (
-                  <div className="h-7 w-7 flex-shrink-0 rounded-full bg-[#f472b6] flex items-center justify-center text-white text-xs font-bold">
+                  <div className="h-7 w-7 flex-shrink-0 rounded-full bg-[var(--accent)] flex items-center justify-center text-white text-xs font-bold">
                     {session?.user?.name?.charAt(0).toUpperCase() || "G"}
                   </div>
                 ),
               }}
-              className="hover:bg-[#27272a] rounded-lg transition-colors"
+              className="hover:bg-[var(--surface-2)] dark:hover:bg-[var(--surface-3)] rounded-lg transition-colors"
             />
           </div>
         </SidebarBody>
@@ -570,15 +576,15 @@ export default function DocumentSidebar({ currentDocId, showStats = false }: { c
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setShowFolderInput(false)}
-              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+              className="absolute inset-0 bg-black/40 dark:bg-black/60 backdrop-blur-sm"
             />
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-sm bg-[#18181b] border border-[#27272a] rounded-xl shadow-2xl p-6 overflow-hidden"
+              className="relative w-full max-w-sm ui-panel rounded-xl p-6 overflow-hidden"
             >
-              <h3 className="text-lg font-bold text-white mb-4">New Folder</h3>
+              <h3 className="text-lg font-bold text-[var(--foreground)] mb-4">New Folder</h3>
               <input
                 autoFocus
                 type="text"
@@ -589,19 +595,19 @@ export default function DocumentSidebar({ currentDocId, showStats = false }: { c
                   if (e.key === 'Escape') setShowFolderInput(false)
                 }}
                 placeholder="Folder Name"
-                className="w-full bg-[#0a0a0a] border border-[#27272a] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#f472b6] transition-colors mb-4"
+                className="ui-input mb-4"
               />
               <div className="flex justify-end gap-2">
                 <button
                   onClick={() => setShowFolderInput(false)}
-                  className="px-4 py-2 text-sm font-medium text-zinc-400 hover:text-white transition-colors"
+                  className="ui-btn"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleCreateFolder}
                   disabled={!newFolderName.trim()}
-                  className="px-4 py-2 text-sm font-medium text-white bg-[#f472b6] hover:bg-[#ec4899] rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="ui-btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Create
                 </button>
@@ -629,13 +635,13 @@ const Logo = () => {
   return (
     <Link
       href="/"
-      className="font-normal flex space-x-2 items-center text-sm text-black py-1 relative z-20"
+      className="font-normal flex space-x-2 items-center text-sm text-[var(--foreground)] py-1 relative z-20"
     >
-      <div className="h-5 w-6 bg-gradient-to-br from-[#f472b6] to-[#ec4899] rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0" />
+      <div className="h-5 w-6 bg-[var(--accent)] rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0" />
       <motion.span
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="font-medium text-white whitespace-pre"
+        className="font-medium text-[var(--foreground)] whitespace-pre"
       >
         Zenith
       </motion.span>
@@ -647,9 +653,9 @@ const LogoIcon = () => {
   return (
     <Link
       href="/"
-      className="font-normal flex space-x-2 items-center text-sm text-black py-1 relative z-20"
+      className="font-normal flex space-x-2 items-center text-sm text-[var(--foreground)] py-1 relative z-20"
     >
-      <div className="h-5 w-6 bg-gradient-to-br from-[#f472b6] to-[#ec4899] rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0" />
+      <div className="h-5 w-6 bg-[var(--accent)] rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0" />
     </Link>
   );
 };
@@ -675,7 +681,7 @@ function SidebarButton({ link, className, onClick }: { link: any, className?: st
           display: animate ? (open ? "inline-block" : "none") : "inline-block",
           opacity: animate ? (open ? 1 : 0) : 1,
         }}
-        className="text-neutral-700 dark:text-neutral-200 text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0"
+        className="text-inherit text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0"
       >
         {link.label}
       </motion.span>

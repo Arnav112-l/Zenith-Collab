@@ -101,11 +101,11 @@ export default function TimeTrackerEditor({ content, onChange, readOnly }: TimeT
   const totalTime = entries.reduce((acc, curr) => acc + curr.duration, 0);
 
   return (
-    <div className="h-full w-full bg-[#0a0a0a] p-8 overflow-y-auto">
+    <div className="h-full w-full bg-[var(--background)] p-8 overflow-y-auto">
       <div className="max-w-4xl mx-auto space-y-8">
         {/* Timer Control */}
         {!readOnly && (
-          <div className="bg-[#18181b] p-6 rounded-2xl border border-[#27272a] shadow-lg">
+          <div className="bg-[var(--surface-2)] p-6 rounded-2xl border border-[var(--border)] shadow-lg">
             <div className="flex flex-col md:flex-row items-center gap-4">
               <div className="flex-1 w-full">
                 <input
@@ -114,17 +114,17 @@ export default function TimeTrackerEditor({ content, onChange, readOnly }: TimeT
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   disabled={!!activeEntry}
-                  className="w-full bg-[#27272a] text-white text-lg rounded-xl px-4 py-3 border border-[#3f3f46] focus:outline-none focus:border-[#f472b6] placeholder:text-[#52525b]"
+                  className="w-full bg-[#27272a] text-[var(--foreground)] text-lg rounded-xl px-4 py-3 border border-[#3f3f46] focus:outline-none focus:border-[#f472b6] placeholder:text-[#52525b]"
                 />
               </div>
               <div className="flex items-center gap-4 w-full md:w-auto justify-between md:justify-start">
-                <div className="text-3xl font-mono font-bold text-white tabular-nums">
+                <div className="text-3xl font-mono font-bold text-[var(--foreground)] tabular-nums">
                   {formatTime(elapsed)}
                 </div>
                 {activeEntry ? (
                   <button
                     onClick={stopTimer}
-                    className="bg-red-500 hover:bg-red-600 text-white p-3 rounded-xl transition-colors shadow-[0_0_15px_rgba(239,68,68,0.3)]"
+                    className="bg-red-500 hover:bg-red-600 text-[var(--foreground)] p-3 rounded-xl transition-colors shadow-[0_0_15px_rgba(239,68,68,0.3)]"
                   >
                     <Square fill="currentColor" size={20} />
                   </button>
@@ -144,21 +144,21 @@ export default function TimeTrackerEditor({ content, onChange, readOnly }: TimeT
 
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-[#18181b] p-6 rounded-2xl border border-[#27272a]">
+          <div className="bg-[var(--surface-2)] p-6 rounded-2xl border border-[var(--border)]">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-[#a1a1aa] font-medium">Total Time</h3>
               <Clock className="w-5 h-5 text-[#f472b6]" />
             </div>
-            <p className="text-2xl font-bold text-white">{formatTime(totalTime)}</p>
+            <p className="text-2xl font-bold text-[var(--foreground)]">{formatTime(totalTime)}</p>
           </div>
-          <div className="bg-[#18181b] p-6 rounded-2xl border border-[#27272a]">
+          <div className="bg-[var(--surface-2)] p-6 rounded-2xl border border-[var(--border)]">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-[#a1a1aa] font-medium">Entries</h3>
               <div className="text-[#f472b6] font-bold">{entries.length}</div>
             </div>
             <p className="text-sm text-[#a1a1aa]">Total recorded sessions</p>
           </div>
-          <div className="bg-[#18181b] p-6 rounded-2xl border border-[#27272a]">
+          <div className="bg-[var(--surface-2)] p-6 rounded-2xl border border-[var(--border)]">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-[#a1a1aa] font-medium">Average Session</h3>
               <div className="text-[#f472b6] font-bold">
@@ -170,21 +170,21 @@ export default function TimeTrackerEditor({ content, onChange, readOnly }: TimeT
         </div>
 
         {/* History */}
-        <div className="bg-[#18181b] rounded-2xl border border-[#27272a] overflow-hidden">
-          <div className="p-6 border-b border-[#27272a]">
-            <h3 className="text-white font-semibold">History</h3>
+        <div className="bg-[var(--surface-2)] rounded-2xl border border-[var(--border)] overflow-hidden">
+          <div className="p-6 border-b border-[var(--border)]">
+            <h3 className="text-[var(--foreground)] font-semibold">History</h3>
           </div>
           <div className="divide-y divide-[#27272a]">
             {entries.map((entry) => (
-              <div key={entry.id} className="p-4 flex items-center justify-between hover:bg-[#27272a]/50 transition-colors group">
+              <div key={entry.id} className="p-4 flex items-center justify-between hover:bg-[var(--surface-2)]/50 transition-colors group">
                 <div>
-                  <p className="text-white font-medium">{entry.description}</p>
+                  <p className="text-[var(--foreground)] font-medium">{entry.description}</p>
                   <p className="text-xs text-[#a1a1aa]">
                     {new Date(entry.startTime).toLocaleString()}
                   </p>
                 </div>
                 <div className="flex items-center gap-4">
-                  <span className="font-mono text-white font-medium">
+                  <span className="font-mono text-[var(--foreground)] font-medium">
                     {formatTime(entry.duration)}
                   </span>
                   {!readOnly && (

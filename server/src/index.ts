@@ -1,46 +1,90 @@
+import 'dotenv/config'
 import { Server } from '@hocuspocus/server'
 import { Database } from '@hocuspocus/extension-database'
 import { PrismaClient } from '@prisma/client'
 import jwt from 'jsonwebtoken'
+import * as Y from 'yjs'
 import { startEventScheduler } from './scheduler'
 
 const prisma = new PrismaClient()
+const port = Number(process.env.PORT) || 4000
 
-// Start event notification scheduler
 startEventScheduler()
 
-// Document creation is now handled by Next.js API (client/src/app/api/documents/route.ts)
+function isValidYjsUpdate(bytes: Uint8Array): boolean {
+    try {
+        const doc = new Y.Doc()
+        Y.applyUpdate(doc, bytes)
+        doc.destroy()
+        return true
+    } catch {
+        return false
+    }
+}
+
+function migratePlainTextToYjs(plainText: string): Uint8Array {
+    const ydoc = new Y.Doc()
+    const ytext = ydoc.getText('monaco')
+    if (plainText) {
+        ytext.insert(0, plainText)
+    }
+    const update = Y.encodeStateAsUpdate(ydoc)
+    ydoc.destroy()
+    return update
+}
 
 const hocuspocus = new Server({
-    port: 4000,
+    port,
     extensions: [
         new Database({
             fetch: async ({ documentName }) => {
-                console.log(`DEBUG: Fetching document ${documentName}`)
+                console.log(`Fetching document ${documentName}`)
                 const doc = await prisma.document.findUnique({
                     where: { id: documentName },
                 })
-                if (doc?.content) {
-                    console.log(`DEBUG: Found document with content size: ${doc.content.length} bytes`)
-                    return doc.content
+                if (!doc?.content) {
+                    console.log(`No content found for document ${documentName}`)
+                    return null
                 }
-                console.log(`DEBUG: No content found for document ${documentName}`)
-                return null
+
+                const bytes = new Uint8Array(doc.content)
+                if (isValidYjsUpdate(bytes)) {
+                    return Buffer.from(bytes)
+                }
+
+                // Legacy CODE docs were plain UTF-8 — migrate to Y.Text("monaco")
+                if (doc.type === 'CODE') {
+                    const plainText = Buffer.from(bytes).toString('utf8')
+                    const migrated = migratePlainTextToYjs(plainText)
+                    await prisma.document.update({
+                        where: { id: documentName },
+                        data: { content: Buffer.from(migrated) },
+                    })
+                    console.log(`Migrated legacy CODE content to Yjs for ${documentName}`)
+                    return Buffer.from(migrated)
+                }
+
+                // Unreadable non-CODE binary: start from empty Yjs doc (do not persist wipe)
+                console.warn(`Invalid Yjs content for ${documentName}; serving empty document`)
+                return Buffer.from(Y.encodeStateAsUpdate(new Y.Doc()))
             },
             store: async ({ documentName, state }) => {
-                console.log(`DEBUG: Storing document ${documentName}, size: ${state.length} bytes`)
-                await prisma.document.upsert({
+                console.log(`Storing document ${documentName}, size: ${state.length} bytes`)
+                const existing = await prisma.document.findUnique({
                     where: { id: documentName },
-                    create: {
-                        id: documentName,
-                        content: Buffer.from(state),
-                        title: 'Untitled',
-                    },
-                    update: {
+                    select: { id: true },
+                })
+                if (!existing) {
+                    console.warn(`Refusing to create orphan document ${documentName}`)
+                    return
+                }
+                await prisma.document.update({
+                    where: { id: documentName },
+                    data: {
                         content: Buffer.from(state),
                     },
                 })
-                console.log(`DEBUG: Document ${documentName} saved successfully`)
+                console.log(`Document ${documentName} saved successfully`)
             },
         }),
     ],
@@ -48,32 +92,32 @@ const hocuspocus = new Server({
         const { documentName, requestParameters, connection } = data
         let { token } = data
 
-        console.log('DEBUG: onAuthenticate called for document:', documentName)
-
         if (!token && requestParameters) {
-            // Check both direct property and .get() method (URLSearchParams)
             token = requestParameters.token || (requestParameters.get && requestParameters.get('token'))
         }
 
         if (!token) {
-            console.error('DEBUG: No token provided')
             throw new Error('Unauthorized: No token provided')
         }
 
         try {
-            const secret = process.env.NEXTAUTH_SECRET || 'supersecret-random-string-for-dev-environment-only'
-            const payload = jwt.verify(token as string, secret) as any
+            const secret = process.env.NEXTAUTH_SECRET
+            if (!secret) {
+                throw new Error('Unauthorized: Server misconfigured')
+            }
 
-            console.log('DEBUG: Auth successful - Permission:', payload.permission)
+            const payload = jwt.verify(token as string, secret) as any
 
             if (payload.documentId !== documentName) {
                 throw new Error('Unauthorized: Invalid document ID')
             }
 
-            // Set read-only mode if permission is READ
+            if (payload.permission !== 'READ' && payload.permission !== 'WRITE') {
+                throw new Error('Unauthorized: Invalid permission')
+            }
+
             if (payload.permission === 'READ' && connection) {
                 connection.readOnly = true
-                console.log(`DEBUG: Connection set to READ-ONLY mode`)
             }
 
             return {
@@ -82,22 +126,12 @@ const hocuspocus = new Server({
                     permission: payload.permission
                 }
             }
-
         } catch (error) {
             console.error('Auth failed:', error)
             throw new Error('Unauthorized: Invalid token')
         }
     },
-    async onChange(data: any) {
-        console.log(`DEBUG: Document changed: ${data.documentName}, context: ${data.context}`)
-    },
-    async onConnect(data: any) {
-        console.log('DEBUG: Client connected')
-    },
-    async onDisconnect(data: any) {
-        console.log('DEBUG: Client disconnected')
-    },
 })
 
 hocuspocus.listen()
-console.log('Hocuspocus server running on port 4000')
+console.log(`Hocuspocus server running on port ${port}`)

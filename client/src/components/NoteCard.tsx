@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Clock, MoreVertical, FileText, Trash, Edit2, Check, X } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useRef, useEffect } from 'react';
+import { fadeUp } from '@/components/motion';
 
 interface NoteCardProps {
   id: string;
@@ -89,15 +90,16 @@ export default function NoteCard({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -4 }}
+      variants={fadeUp}
+      whileHover={{ y: -4, scale: 1.01 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 24 }}
       className="relative group h-full"
     >
       <div className={`
-        relative h-full p-5 rounded-2xl border border-white/5 
-        bg-zinc-900/50 backdrop-blur-xl 
+        relative h-full p-5 rounded-2xl border border-zinc-200 dark:border-white/5 
+        bg-white dark:bg-zinc-900/50 backdrop-blur-xl 
         transition-all duration-500 ease-out
+        shadow-sm dark:shadow-none
         ${colorStyles[color]}
       `}>
         {/* Main Link Overlay */}
@@ -118,7 +120,7 @@ export default function NoteCard({
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="w-full bg-zinc-800/50 text-zinc-100 px-2 py-1 rounded border border-zinc-700 focus:outline-none focus:border-indigo-500 text-lg font-semibold"
+                  className="w-full bg-zinc-100 dark:bg-zinc-800/50 text-zinc-900 dark:text-zinc-100 px-2 py-1 rounded border border-zinc-300 dark:border-zinc-700 focus:outline-none focus:border-indigo-500 text-lg font-semibold"
                   onBlur={() => handleRenameSubmit()}
                   onKeyDown={(e) => {
                     if (e.key === 'Escape') {
@@ -129,14 +131,14 @@ export default function NoteCard({
                 />
               </form>
             ) : (
-              <div className="pointer-events-none"> {/* Allow click to pass through to Link */}
-                <h3 className="font-semibold text-zinc-100 mb-1.5 truncate pr-2 text-lg">
+              <div className="pointer-events-none">
+                <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 mb-1.5 truncate pr-2 text-lg">
                   {title}
                 </h3>
                 <div className="flex items-center gap-2 text-xs text-zinc-500">
                   <Clock className="w-3.5 h-3.5" />
                   <span>{time}</span>
-                  {isFavorite && <span className="text-yellow-400 ml-2">★</span>}
+                  {isFavorite && <span className="text-yellow-500 dark:text-yellow-400 ml-2">★</span>}
                 </div>
               </div>
             )}
@@ -149,13 +151,13 @@ export default function NoteCard({
                 e.stopPropagation();
                 setShowMenu(!showMenu);
               }}
-              className="p-1.5 text-zinc-500 hover:text-zinc-200 hover:bg-white/10 rounded-lg transition-colors opacity-100 lg:opacity-0 lg:group-hover:opacity-100"
+              className="p-1.5 text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-white/10 rounded-lg transition-colors opacity-100 lg:opacity-0 lg:group-hover:opacity-100"
             >
               <MoreVertical className="w-4 h-4" />
             </button>
 
             {showMenu && (
-              <div className="absolute right-0 top-full mt-2 w-48 bg-zinc-900 border border-zinc-800 rounded-xl shadow-xl z-20 overflow-hidden">
+              <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-xl z-20 overflow-hidden">
                 {!isTrash && (
                   <>
                     <button
@@ -165,7 +167,7 @@ export default function NoteCard({
                         setIsRenaming(true);
                         setShowMenu(false);
                       }}
-                      className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-zinc-400 hover:text-zinc-100 hover:bg-white/5 transition-colors"
+                      className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-white/5 transition-colors"
                     >
                       <Edit2 className="w-4 h-4" />
                       Rename
@@ -177,7 +179,7 @@ export default function NoteCard({
                         onFavorite?.(id);
                         setShowMenu(false);
                       }}
-                      className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-zinc-400 hover:text-zinc-100 hover:bg-white/5 transition-colors"
+                      className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-white/5 transition-colors"
                     >
                       <span className="w-4 h-4 flex items-center justify-center">{isFavorite ? '★' : '☆'}</span>
                       {isFavorite ? 'Unfavorite' : 'Favorite'}
@@ -190,7 +192,7 @@ export default function NoteCard({
                           onArchive?.(id);
                           setShowMenu(false);
                         }}
-                        className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-zinc-400 hover:text-zinc-100 hover:bg-white/5 transition-colors"
+                        className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-white/5 transition-colors"
                       >
                         <FileText className="w-4 h-4" />
                         Archive
@@ -207,14 +209,14 @@ export default function NoteCard({
                       onRestore?.(id);
                       setShowMenu(false);
                     }}
-                    className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-green-400 hover:text-green-300 hover:bg-green-500/10 transition-colors"
+                    className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 hover:bg-green-500/10 transition-colors"
                   >
                     <Check className="w-4 h-4" />
                     Restore
                   </button>
                 )}
 
-                <div className="my-1 h-px bg-white/10" />
+                <div className="my-1 h-px bg-zinc-200 dark:bg-white/10" />
                 
                 <button
                   onClick={(e) => {
@@ -227,7 +229,7 @@ export default function NoteCard({
                     }
                     setShowMenu(false);
                   }}
-                  className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors"
+                  className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300 hover:bg-red-500/10 transition-colors"
                 >
                   <Trash className="w-4 h-4" />
                   {isTrash ? 'Delete Forever' : 'Delete'}
@@ -238,7 +240,7 @@ export default function NoteCard({
         </div>
 
         {/* Content Preview */}
-        <p className="relative z-0 text-sm text-zinc-400 mb-6 line-clamp-2 leading-relaxed pointer-events-none">
+        <p className="relative z-0 text-sm text-zinc-600 dark:text-zinc-400 mb-6 line-clamp-2 leading-relaxed pointer-events-none">
           {snippet}
         </p>
 

@@ -11,60 +11,67 @@ interface CalendarEvent {
   end: Date;
   emailNotification?: boolean;
   notifyBefore?: number; // minutes before event
+  reminderSentAt?: string;
 }
 
 // Check for upcoming events and send notifications
 const checkUpcomingEvents = async () => {
   try {
-    // Get all documents with users
     const documents = await prisma.document.findMany({
+      where: { type: 'CALENDAR' },
       include: {
         user: true,
       },
     });
 
     const now = new Date();
-    
+
     for (const doc of documents) {
       if (!doc.user?.email) continue;
-      
+
       try {
         const content = doc.content.toString('utf-8');
-        
-        // Try to parse as JSON array (calendar events)
+
         let events: CalendarEvent[];
         try {
           events = JSON.parse(content);
-          if (!Array.isArray(events)) continue; // Skip if not an array
+          if (!Array.isArray(events)) continue;
         } catch {
-          continue; // Skip if not valid JSON
+          continue;
         }
-        
+
+        let eventsChanged = false;
+
         for (const event of events) {
-          // Skip if email notifications are disabled for this event
           if (event.emailNotification === false) continue;
-          
+          if (event.reminderSentAt) continue;
+
           const eventStart = new Date(event.start);
           const timeUntilEvent = eventStart.getTime() - now.getTime();
           const minutesUntilEvent = timeUntilEvent / (1000 * 60);
-          
-          // Default: notify 24 hours (1440 minutes) before
+
           const notifyBefore = event.notifyBefore || 1440;
-          
-          // Check if we should send notification
-          // Send if event is within notification window and hasn't started yet
+
           if (minutesUntilEvent > 0 && minutesUntilEvent <= notifyBefore && minutesUntilEvent > notifyBefore - 60) {
             await sendEventReminderEmail(
               doc.user.email,
-              event.title,
+              event.title || 'Untitled event',
               event.start,
               event.end
             );
+            event.reminderSentAt = now.toISOString();
+            eventsChanged = true;
             console.log(`Sent reminder for event: ${event.title} to ${doc.user.email}`);
           }
         }
-      } catch (error) {
-        // Skip documents that aren't calendar events
+
+        if (eventsChanged) {
+          await prisma.document.update({
+            where: { id: doc.id },
+            data: { content: Buffer.from(JSON.stringify(events)) },
+          });
+        }
+      } catch {
         continue;
       }
     }
@@ -76,11 +83,9 @@ const checkUpcomingEvents = async () => {
 // Run every hour
 export const startEventScheduler = () => {
   console.log('📧 Event notification scheduler started');
-  
-  // Run immediately on startup
+
   checkUpcomingEvents();
-  
-  // Schedule to run every hour
+
   cron.schedule('0 * * * *', () => {
     console.log('Running scheduled event check...');
     checkUpcomingEvents();

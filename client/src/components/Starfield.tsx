@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useTheme } from 'next-themes'
 
 interface Star {
   id: number
@@ -12,6 +13,12 @@ interface Star {
 
 export default function Starfield() {
   const [stars, setStars] = useState<Star[]>([])
+  const { resolvedTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   useEffect(() => {
     const newStars = Array.from({ length: 100 }, (_, i) => ({
@@ -23,6 +30,10 @@ export default function Starfield() {
     }))
     setStars(newStars)
   }, [])
+
+  if (mounted && resolvedTheme === 'light') {
+    return null
+  }
 
   return (
     <div className="fixed inset-0 opacity-50 pointer-events-none z-0">

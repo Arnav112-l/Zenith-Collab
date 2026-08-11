@@ -7,6 +7,7 @@ import * as Y from "yjs";
 import { HocuspocusProvider } from "@hocuspocus/provider";
 import { MonacoBinding } from "y-monaco";
 import { IndexeddbPersistence } from "y-indexeddb";
+import { useSession } from "next-auth/react";
 
 interface CollaborativeCodeEditorProps {
   documentId: string;
@@ -29,14 +30,14 @@ export default function CollaborativeCodeEditor({
   readOnly = false,
   token,
 }: CollaborativeCodeEditorProps) {
-  // Auth removed: session logic deleted
+  const { data: session } = useSession();
   const [output, setOutput] = useState<string | null>(null);
   const [input, setInput] = useState<string>("");
   const [isRunning, setIsRunning] = useState(false);
   const [isTerminalOpen, setIsTerminalOpen] = useState(true);
   const [language, setLanguage] = useState("javascript");
   const [status, setStatus] = useState("connecting");
-  
+
   const editorRef = useRef<any>(null);
   const ydocRef = useRef<Y.Doc | null>(null);
   const providerRef = useRef<HocuspocusProvider | null>(null);
@@ -53,7 +54,6 @@ export default function CollaborativeCodeEditor({
     rust: "// Start coding...\nfn main() {\n    println!(\"Hello World\");\n}",
   };
 
-  // Initialize Yjs and Hocuspocus
   useEffect(() => {
     const ydoc = new Y.Doc();
     ydocRef.current = ydoc;
@@ -69,7 +69,6 @@ export default function CollaborativeCodeEditor({
     } as any);
     providerRef.current = provider;
 
-    // Set up IndexedDB persistence for offline support
     const indexeddbProvider = new IndexeddbPersistence(documentId, ydoc);
 
     return () => {
@@ -80,13 +79,20 @@ export default function CollaborativeCodeEditor({
     };
   }, [documentId, token]);
 
-  const handleEditorMount: OnMount = (editor, monaco) => {
+  useEffect(() => {
+    if (!providerRef.current) return;
+    providerRef.current.awareness?.setLocalStateField("user", {
+      name: session?.user?.name || "Anonymous",
+      color: COLORS[Math.floor(Math.random() * COLORS.length)],
+    });
+  }, [session?.user?.name]);
+
+  const handleEditorMount: OnMount = (editor) => {
     editorRef.current = editor;
 
     if (ydocRef.current && providerRef.current) {
       const ytext = ydocRef.current.getText("monaco");
 
-      // Create Monaco binding for Yjs
       const binding = new MonacoBinding(
         ytext,
         editor.getModel()!,
@@ -95,9 +101,8 @@ export default function CollaborativeCodeEditor({
       );
       bindingRef.current = binding;
 
-      // Set user awareness to Anonymous
       providerRef.current.awareness?.setLocalStateField("user", {
-        name: "Anonymous",
+        name: session?.user?.name || "Anonymous",
         color: COLORS[Math.floor(Math.random() * COLORS.length)],
       });
     }
@@ -115,7 +120,7 @@ export default function CollaborativeCodeEditor({
 
   const handleRun = async () => {
     if (!editorRef.current) return;
-    
+
     setIsRunning(true);
     setIsTerminalOpen(true);
     setOutput("Running...");
@@ -134,6 +139,11 @@ export default function CollaborativeCodeEditor({
       });
 
       const data = await response.json();
+
+      if (response.status === 401) {
+        setOutput("Sign in to run code.");
+        return;
+      }
 
       if (data.run) {
         let result = "";
@@ -155,13 +165,12 @@ export default function CollaborativeCodeEditor({
 
   return (
     <div className="h-full w-full bg-[#1e1e1e] flex flex-col relative overflow-hidden">
-      {/* Toolbar */}
       <div className="flex items-center justify-between px-4 py-2 bg-[#2d2d2d] border-b border-[#3e3e3e]">
         <div className="flex items-center gap-4">
           <select
             value={language}
             onChange={(e) => handleLanguageChange(e.target.value)}
-            className="bg-[#3e3e3e] text-white text-sm rounded px-2 py-1 border border-[#52525b] focus:outline-none focus:border-[#f472b6]"
+            className="bg-[#3e3e3e] text-[var(--foreground)] text-sm rounded px-2 py-1 border border-[#52525b] focus:outline-none focus:border-[#f472b6]"
           >
             <option value="javascript">JavaScript</option>
             <option value="typescript">TypeScript</option>
@@ -175,7 +184,6 @@ export default function CollaborativeCodeEditor({
         </div>
 
         <div className="flex items-center gap-3">
-          {/* Sync Status Indicator */}
           <div className="flex items-center gap-2 px-3 py-1 bg-[#1e1e1e] rounded-full border border-[#3e3e3e]">
             <div className="relative">
               <div
@@ -209,7 +217,6 @@ export default function CollaborativeCodeEditor({
         </div>
       </div>
 
-      {/* Editor Area */}
       <div className="flex-1 relative min-h-0">
         <Editor
           height="100%"
@@ -232,18 +239,16 @@ export default function CollaborativeCodeEditor({
         />
       </div>
 
-      {/* Terminal Panel */}
       <div
         className={`bg-[#1e1e1e] border-t border-[#3e3e3e] flex flex-col transition-all duration-300 ease-in-out ${
           isTerminalOpen ? "h-[35%]" : "h-10"
         }`}
       >
-        {/* Terminal Header */}
         <div
           className="flex items-center justify-between px-4 py-2 bg-[#252526] cursor-pointer hover:bg-[#2a2a2b]"
           onClick={() => setIsTerminalOpen(!isTerminalOpen)}
         >
-          <div className="flex items-center gap-2 text-zinc-400">
+          <div className="flex items-center gap-2 text-[var(--muted)]">
             <Terminal size={14} />
             <span className="text-xs font-medium uppercase tracking-wider">
               Terminal
@@ -257,33 +262,31 @@ export default function CollaborativeCodeEditor({
                   setOutput(null);
                   setInput("");
                 }}
-                className="p-1 hover:bg-[#3e3e3e] rounded text-zinc-500 hover:text-zinc-300"
+                className="p-1 hover:bg-[#3e3e3e] rounded text-[var(--muted)] hover:text-zinc-300"
                 title="Clear Console"
               >
                 <Trash2 size={12} />
               </button>
             )}
             {isTerminalOpen ? (
-              <ChevronDown size={14} className="text-zinc-500" />
+              <ChevronDown size={14} className="text-[var(--muted)]" />
             ) : (
-              <ChevronUp size={14} className="text-zinc-500" />
+              <ChevronUp size={14} className="text-[var(--muted)]" />
             )}
           </div>
         </div>
 
-        {/* Terminal Content - Input & Output Sections */}
         {isTerminalOpen && (
           <div className="flex-1 flex min-h-0 overflow-hidden">
-            {/* Input Section */}
             <div className="w-1/2 flex flex-col border-r border-[#3e3e3e]">
               <div className="flex items-center justify-between px-3 py-1.5 bg-[#2d2d2d] border-b border-[#3e3e3e]">
-                <span className="text-xs font-medium text-zinc-500 uppercase tracking-wider">
+                <span className="text-xs font-medium text-[var(--muted)] uppercase tracking-wider">
                   Input (stdin)
                 </span>
                 {input && (
                   <button
                     onClick={() => setInput("")}
-                    className="p-0.5 hover:bg-[#3e3e3e] rounded text-zinc-600 hover:text-zinc-400"
+                    className="p-0.5 hover:bg-[#3e3e3e] rounded text-zinc-600 hover:text-[var(--muted)]"
                     title="Clear Input"
                   >
                     <Trash2 size={10} />
@@ -299,16 +302,15 @@ export default function CollaborativeCodeEditor({
               />
             </div>
 
-            {/* Output Section */}
             <div className="w-1/2 flex flex-col">
               <div className="flex items-center justify-between px-3 py-1.5 bg-[#2d2d2d] border-b border-[#3e3e3e]">
-                <span className="text-xs font-medium text-zinc-500 uppercase tracking-wider">
+                <span className="text-xs font-medium text-[var(--muted)] uppercase tracking-wider">
                   Output
                 </span>
                 {output && (
                   <button
                     onClick={() => setOutput(null)}
-                    className="p-0.5 hover:bg-[#3e3e3e] rounded text-zinc-600 hover:text-zinc-400"
+                    className="p-0.5 hover:bg-[#3e3e3e] rounded text-zinc-600 hover:text-[var(--muted)]"
                     title="Clear Output"
                   >
                     <Trash2 size={10} />
@@ -320,7 +322,7 @@ export default function CollaborativeCodeEditor({
                   <pre className="whitespace-pre-wrap text-zinc-300">{output}</pre>
                 ) : (
                   <div className="text-zinc-600 italic">
-                    Click "Run" to execute your code...
+                    Click &quot;Run&quot; to execute your code...
                   </div>
                 )}
               </div>

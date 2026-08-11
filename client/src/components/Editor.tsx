@@ -169,7 +169,7 @@ const Editor = ({ documentId, readOnly = false, token }: { documentId: string; r
     <div className="relative w-full h-full">
       {/* Notion-style minimal status bar */}
       <div className="absolute top-4 right-4 sm:right-8 md:right-12 lg:right-16 z-10 flex items-center gap-3">
-        <div className="flex items-center gap-2 px-3 py-1.5 bg-[#0a0a0a]/50 backdrop-blur-md rounded-full shadow-lg border border-[#27272a]/50 group hover:border-[#f472b6]/50 transition-colors">
+        <div className="flex items-center gap-2 px-3 py-1.5 bg-[var(--background)]/50 backdrop-blur-md rounded-full shadow-lg border border-[var(--border)]/50 group hover:border-[#f472b6]/50 transition-colors">
           <div className="relative">
             <div className={`h-1.5 w-1.5 rounded-full transition-colors duration-500 ${
               status === 'connected' ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]' : 'bg-yellow-500'
@@ -178,12 +178,12 @@ const Editor = ({ documentId, readOnly = false, token }: { documentId: string; r
               <div className="absolute inset-0 h-1.5 w-1.5 rounded-full bg-green-500 animate-ping opacity-75" />
             )}
           </div>
-          <span className="text-[10px] font-medium text-[#a1a1aa] uppercase tracking-wider group-hover:text-white transition-colors">
+          <span className="text-[10px] font-medium text-[#a1a1aa] uppercase tracking-wider group-hover:text-[var(--foreground)] transition-colors">
             {status === 'connected' ? 'Synced' : 'Syncing'}
           </span>
         </div>
         {readOnly && (
-          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-[#0a0a0a]/90 backdrop-blur-sm text-[#a1a1aa] shadow-sm border border-[#27272a]">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-[var(--background)]/90 backdrop-blur-sm text-[#a1a1aa] shadow-sm border border-[var(--border)]">
             <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
             </svg>
@@ -205,8 +205,8 @@ const Editor = ({ documentId, readOnly = false, token }: { documentId: string; r
           <div className="h-full flex flex-col items-center justify-center p-16 text-center">
             <div className="relative mb-6">
               <div className="absolute inset-0 bg-[#f472b6] blur-xl opacity-20 animate-pulse" />
-              <div className="relative inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[#0a0a0a] border border-[#27272a] shadow-xl">
-                <div className="animate-spin rounded-full h-8 w-8 border-2 border-[#27272a] border-t-[#f472b6]" />
+              <div className="relative inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[var(--background)] border border-[var(--border)] shadow-xl">
+                <div className="animate-spin rounded-full h-8 w-8 border-2 border-[var(--border)] border-t-[#f472b6]" />
               </div>
             </div>
             <TextShimmer 

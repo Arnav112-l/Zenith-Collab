@@ -46,16 +46,15 @@ class ErrorBoundary extends Component<Props, State> {
 
       return (
         <div className="min-h-screen bg-black flex items-center justify-center p-4">
-          <div className="max-w-md w-full bg-[#0a0a0a] border border-[#27272a] rounded-2xl p-8 text-center">
+          <div className="max-w-md w-full bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-8 text-center">
             <div className="mb-6 inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-500/10">
               <AlertTriangle className="w-8 h-8 text-red-500" />
             </div>
-                        DATABASE_URL="postgresql://username:password@host/database?sslmode=require"                        DATABASE_URL="postgresql://username:password@host/database?sslmode=require"                        DATABASE_URL="postgresql://username:password@host/database?sslmode=require"                        DATABASE_URL="mongodb+srv://your-username:your-password@cluster0.xxxxx.mongodb.net/zenith?retryWrites=true&w=majority"
             <h1 className="text-2xl font-bold text-white mb-2">
               Something went wrong
             </h1>
             
-            <p className="text-[#a1a1aa] mb-6">
+            <p className="text-[var(--muted)] mb-6">
               We encountered an unexpected error. Please try refreshing the page or go back to the dashboard.
             </p>
 
@@ -70,7 +69,7 @@ class ErrorBoundary extends Component<Props, State> {
             <div className="flex gap-3 justify-center">
               <button
                 onClick={this.handleRetry}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-[#27272a] hover:bg-[#3f3f46] text-white rounded-xl transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--surface-2)] hover:bg-[#3f3f46] text-white rounded-xl transition-colors"
               >
                 <RefreshCw className="w-4 h-4" />
                 Try Again
