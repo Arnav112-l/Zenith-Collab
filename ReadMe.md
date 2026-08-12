@@ -234,7 +234,6 @@ Callback URL: https://your-app.vercel.app/api/auth/callback/github
 
 ---
 
-## Author
 
 **Arnav Singh**
 
